@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/popup"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
     tools:context=".PopUpMap">
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
-        android:padding="10dp"
-
-        android:background="@drawable/popup"
-        >
         <TextView
             android:id="@+id/evenement"
             android:layout_width="wrap_content"
@@ -48,13 +41,28 @@
             android:id="@+id/btnMain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Partager"
+            android:text="Update"
             app:layout_constraintTop_toBottomOf="@+id/btnShare"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constrainedWidth="@id/btnShare"
             ></Button>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:padding="0dp"
+        android:paddingLeft="0dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="0dp"
+        android:paddingRight="0dp"
+        android:text="X"
+        android:textColor="@color/black"
+        app:iconPadding="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></Button>
 
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
