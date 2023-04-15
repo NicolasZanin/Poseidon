@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/buttonWeatherConditonIndicator"
+        android:id="@+id/button_weather_condition_creator"
         android:background="@drawable/round_button"
         android:drawableTop="@drawable/ic_btn_indicate_weather"
         android:drawableTint="@color/white"

@@ -1,10 +1,13 @@
 package etu.poseidon.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import etu.poseidon.models.weather.WeatherCondition;
 
-public class Poi {
+public class Poi implements Parcelable {
 
     @SerializedName("_id")
     private String id;
@@ -16,7 +19,6 @@ public class Poi {
     private WeatherCondition weatherCondition;
     @SerializedName("createdAt")
     private String createdAt;
-
     @SerializedName("updatedAt")
     private String updatedAt;
     @SerializedName("finished")
@@ -115,4 +117,44 @@ public class Poi {
                 ", perimeter=" + perimeter +
                 '}';
     }
+
+    protected Poi(Parcel in) {
+        id = in.readString();
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        weatherCondition = in.readParcelable(WeatherCondition.class.getClassLoader());
+        createdAt = in.readString();
+        updatedAt = in.readString();
+        isFinished = in.readByte() != 0;
+        perimeter = in.readDouble();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
+        dest.writeParcelable(weatherCondition, flags);
+        dest.writeString(createdAt);
+        dest.writeString(updatedAt);
+        dest.writeByte((byte) (isFinished ? 1 : 0));
+        dest.writeDouble(perimeter);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Poi> CREATOR = new Creator<Poi>() {
+        @Override
+        public Poi createFromParcel(Parcel in) {
+            return new Poi(in);
+        }
+
+        @Override
+        public Poi[] newArray(int size) {
+            return new Poi[size];
+        }
+    };
 }

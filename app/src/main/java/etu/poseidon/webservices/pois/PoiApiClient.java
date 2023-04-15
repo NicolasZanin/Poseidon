@@ -71,12 +71,12 @@ public class PoiApiClient {
         call.enqueue(callback);
     }
 
-    public void updatePoi(int poiId, Poi poi, Callback<Poi> callback) {
+    public void updatePoi(String poiId, Poi poi, Callback<Poi> callback) {
         Call<Poi> call = poiApiService.updatePoi(poiId, poi);
         call.enqueue(callback);
     }
 
-    public void deletePoi(int poiId, Callback<Void> callback) {
+    public void deletePoi(String poiId, Callback<Void> callback) {
         Call<Void> call = poiApiService.deletePoi(poiId);
         call.enqueue(callback);
     }

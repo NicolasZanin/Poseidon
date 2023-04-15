@@ -4,11 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -16,7 +14,9 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,9 +26,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener, WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener {
     private MapView map;
     private IMapController gestionnaireMap;
+
+    private Fragment openedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +63,10 @@ public class MainActivity extends AppCompatActivity {
         // Pour mettre le niveau de zoom à 20.0
         gestionnaireMap.setZoom(20.0);
 
-        // Button to open weather condition indicator
-        Button buttonWeatherConditionIndicator = findViewById(R.id.buttonWeatherConditonIndicator);
-        buttonWeatherConditionIndicator.setOnClickListener(v -> {
-            openFragmentWeatherConditionIndicator();
+        // Button to open weather condition creator
+        Button buttonWeatherConditionCreator = findViewById(R.id.button_weather_condition_creator);
+        buttonWeatherConditionCreator.setOnClickListener(v -> {
+            openFragmentWeatherConditionCreator();
         });
 
         // Load all POIs on create
@@ -83,10 +85,22 @@ public class MainActivity extends AppCompatActivity {
         map.onResume();
     }
 
-    private void openFragmentWeatherConditionIndicator() {
-        FragmentWeatherConditionIndicator fragmentWeatherConditionIndicator = new FragmentWeatherConditionIndicator();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) fragmentWeatherConditionIndicator).commit();
+    private void openFragmentWeatherConditionCreator() {
+        closeOpenedFragment();
+        WeatherConditionCreatorFragment weatherConditionCreatorFragment = new WeatherConditionCreatorFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionCreatorFragment).commit();
         // TODO : passer les coordonnées GPS actuelles de la map, pour l'instant les pois sont crées en (43.65020, 7.00517) (comme la map)
+        openedFragment = weatherConditionCreatorFragment;
+    }
+
+    private void openFragmentWeatherConditionUpdater(Poi poi){
+        closeOpenedFragment();
+        WeatherConditionUpdaterFragment weatherConditionUpdaterFragment = new WeatherConditionUpdaterFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("poi_param", poi);
+        weatherConditionUpdaterFragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionUpdaterFragment).commit();
+        openedFragment = weatherConditionUpdaterFragment;
     }
 
     private void loadAllPOIs(){
@@ -121,9 +135,39 @@ public class MainActivity extends AppCompatActivity {
         map.getOverlays().add(poiMarker);
 
         poiMarker.setOnMarkerClickListener((marker, mapView) -> {
-            Toast.makeText(this, "My POI", Toast.LENGTH_SHORT).show();
+            openFragmentWeatherConditionUpdater(poi);
             return false;
         });
+    }
 
+    private void removeAllPOIs(MapView map) {
+        List<Marker> markers = new ArrayList<>();
+        for (Overlay overlay : map.getOverlays()) {
+            if (overlay instanceof Marker) {
+                markers.add((Marker) overlay);
+            }
+        }
+        map.getOverlays().removeAll(markers);
+        map.invalidate();
+    }
+
+
+    private void closeOpenedFragment() {
+        if (openedFragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(openedFragment).commit();
+            openedFragment = null;
+        }
+    }
+
+    @Override
+    public void onWeatherConditionDeleted() {
+        removeAllPOIs(map);
+        loadAllPOIs();
+    }
+
+    @Override
+    public void onWeatherConditionCreated() {
+        removeAllPOIs(map);
+        loadAllPOIs();
     }
 }

@@ -12,14 +12,14 @@
     android:layout_gravity="center"
     android:padding="10dp"
     android:background="@drawable/popup"
-    tools:context=".FragmentWeatherConditionIndicator"
+    tools:context=".WeatherConditionCreatorFragment"
     >
 
     <TextView
         android:id="@+id/label_select_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_weather_select_weather_text"
+        android:text="@string/weather_condition_creator_select_weather_text"
         android:textSize="18sp"
         android:textColor="@color/black"
         android:gravity="center"
@@ -46,7 +46,7 @@
         android:id="@+id/range_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_weather_perimeter"
+        android:text="@string/weather_condition_creator_perimeter"
         android:textSize="18sp"
         android:textColor="@color/black"
         app:layout_constraintTop_toBottomOf="@id/conditions"
@@ -78,7 +78,7 @@
 
         <Button
             android:id="@+id/confirm"
-            android:text="@string/add_weather_button_confirm"
+            android:text="@string/weather_condition_creator_button_confirm"
             android:backgroundTint="@color/green"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
 
         <Button
             android:id="@+id/cancel"
-            android:text="@string/add_weather_button_cancel"
+            android:text="@string/weather_condition_creator_button_cancel"
             android:backgroundTint="@color/red"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

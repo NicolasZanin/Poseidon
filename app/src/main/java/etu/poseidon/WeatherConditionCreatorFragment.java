@@ -1,5 +1,6 @@
 package etu.poseidon;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -28,7 +29,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FragmentWeatherConditionIndicator extends Fragment {
+public class WeatherConditionCreatorFragment extends Fragment {
+
+    public interface OnWeatherConditionCreatedListener {
+        void onWeatherConditionCreated();
+    }
 
     private final int BUTTONS_PER_ROW = 3;
     private final float BUTTONS_DP_SIZE = 90f;
@@ -36,13 +41,15 @@ public class FragmentWeatherConditionIndicator extends Fragment {
     private Map<WeatherCondition, Button> weatherButtons;
     private int perimeter = 10;
 
-    public FragmentWeatherConditionIndicator() {
+    private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
+
+    public WeatherConditionCreatorFragment() {
         // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_weather_condition_indicator, container, false);
+        View view = inflater.inflate(R.layout.fragment_weather_condition_creator, container, false);
 
         addWeatherButtons(view);
 
@@ -50,7 +57,7 @@ public class FragmentWeatherConditionIndicator extends Fragment {
         TextView rangeValue = view.findViewById(R.id.range_value);
 
         // Default value for range text
-        int stringRange = getResources().getIdentifier("add_weather_perimeter", "string", getContext().getPackageName());
+        int stringRange = getResources().getIdentifier("weather_condition_creator_perimeter", "string", getContext().getPackageName());
         rangeValue.setText(getString(stringRange, 10));
 
         range.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -165,8 +172,9 @@ public class FragmentWeatherConditionIndicator extends Fragment {
             @Override
             public void onResponse(Call<Poi> call, Response<Poi> response) {
                 if (response.isSuccessful()) {
-                    int stringSuccess = getResources().getIdentifier("add_weather_weather_sent", "string", getContext().getPackageName());
+                    int stringSuccess = getResources().getIdentifier("weather_condition_creator_weather_sent", "string", getContext().getPackageName());
                     Toast.makeText(getContext(), getString(stringSuccess), Toast.LENGTH_SHORT).show();
+                    mListener.onWeatherConditionCreated();
                     closeFragment();
                 } else {
                     int stringError = getResources().getIdentifier("global_error", "string", getContext().getPackageName());
@@ -184,10 +192,25 @@ public class FragmentWeatherConditionIndicator extends Fragment {
                 closeFragment();
             }
         });
-
     }
 
     private void closeFragment(){
         requireActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener) {
+            mListener = (WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnWeatherConditionCreatedListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 }

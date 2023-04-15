@@ -20,8 +20,8 @@ public interface PoiApiService {
     Call<Poi> createPoi(@Body Poi poi);
 
     @PUT("pois/{id}")
-    Call<Poi> updatePoi(@Path("id") int poiId, @Body Poi poi);
+    Call<Poi> updatePoi(@Path("id") String poiId, @Body Poi poi);
 
     @DELETE("pois/{id}")
-    Call<Void> deletePoi(@Path("id") int poiId);
+    Call<Void> deletePoi(@Path("id") String poiId);
 }
