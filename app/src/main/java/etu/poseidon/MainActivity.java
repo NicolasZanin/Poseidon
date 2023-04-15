@@ -3,7 +3,9 @@ package etu.poseidon;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -45,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Pour mettre le niveau de zoom à 20.0
         gestionnaireMap.setZoom(20.0);
+
+        // Temporary : open other activity to use web service
+        Intent intent = new Intent(this, TestWSActivity.class);
+        Button button = findViewById(R.id.buttonOpenWS);
+        button.setOnClickListener(v -> startActivity(intent));
     }
 
     @Override
