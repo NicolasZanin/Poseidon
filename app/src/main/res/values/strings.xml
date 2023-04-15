@@ -2,4 +2,21 @@
     <string name="app_name">Poseidon</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Global messages -->
+    <string name="global_error">Une erreur est survenue. Veuillez réessayer.</string>
+
+    <!-- Weather conditions -->
+    <string name="weather_sun">Soleil</string>
+    <string name="weather_cloud">Nuages</string>
+    <string name="weather_thunderstorm">Orages</string>
+    <string name="weather_wind">Vent</string>
+    <string name="weather_storm">Tornade</string>
+    <string name="weather_rain">Pluie</string>
+    <!-- Add weather fragments texts -->
+    <string name="add_weather_perimeter">Périmètre : %1$d milles marin</string>
+    <string name="add_weather_button_confirm">Confirmer</string>
+    <string name="add_weather_button_cancel">Annuler</string>
+    <string name="add_weather_select_weather_text">Sélectionner la condition météorologique de votre emplacement actuel</string>
+    <string name="add_weather_weather_sent">Condition météorologique envoyée !</string>
 </resources>
