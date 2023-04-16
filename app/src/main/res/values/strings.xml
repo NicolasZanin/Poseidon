@@ -2,4 +2,32 @@
     <string name="app_name">Poseidon</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Global messages -->
+    <string name="global_error">Une erreur est survenue. Veuillez réessayer.</string>
+
+    <!-- Weather conditions -->
+    <string name="weather_sun">Soleil</string>
+    <string name="weather_cloud">Nuages</string>
+    <string name="weather_thunderstorm">Orages</string>
+    <string name="weather_wind">Vent</string>
+    <string name="weather_storm">Tornade</string>
+    <string name="weather_rain">Pluie</string>
+    <!-- Weather condition creator texts -->
+    <string name="weather_condition_creator_perimeter">Périmètre : %1$d milles marin</string>
+    <string name="weather_condition_creator_button_confirm">Confirmer</string>
+    <string name="weather_condition_creator_button_cancel">Annuler</string>
+    <string name="weather_condition_creator_select_weather_text">Sélectionner la condition météorologique de votre emplacement actuel</string>
+    <string name="weather_condition_creator_weather_sent">Condition météorologique ajoutée !</string>
+    <!-- Weather condition updater texts -->
+    <string name="weather_condition_updater_title">Indication météorologique%1$s</string>
+    <string name="weather_condition_updater_coordinates">Coordonnées : %1$f, %2$f</string>
+    <string name="weather_condition_updater_current_condition">Condition actuelle : %1$s</string>
+    <string name="weather_condition_updater_perimeter">Périmètre : %1$d milles marin</string>
+    <string name="weather_condition_updater_created_at">Créé le : %1$s</string>
+    <string name="weather_condition_updater_last_update">Dernière mise à jour : %1$s</string>
+    <string name="weather_condition_updater_finished">Terminer</string>
+    <string name="weather_condition_updater_close">Fermer</string>
+    <string name="weather_condition_updater_succefully_deleted">Condition météorologique supprimée !</string>
+    <string name="weather_condition_updater_button_information">Si l\'indication météorologique n\'est plus d\'actualité, cliquez sur le bouton \'Terminer\' afin de la supprimer.</string>
 </resources>
