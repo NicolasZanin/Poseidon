@@ -1,6 +1,39 @@
 package etu.poseidon;
 
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+
+import java.io.IOException;
+import java.util.List;
+
+import etu.poseidon.R;
+
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
@@ -46,6 +79,24 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     }
     private Fragment openedFragment;
 
+    private final String TAG = "JULIAN " + getClass().getSimpleName();
+    public static final int DEFAULT_UPDATE_INTERVAL = 30;
+    public static final int FAST_UPDATE_INTERVAL = 5;
+    public static final int PERMISSIONS_FINE_LOCATION = 99;
+    public static final int PERMISSIONS_COARSE_LOCATION = 98;
+
+
+    TextView tv_lat, tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address;
+    Switch sw_gps, sw_locationsupdates;
+
+    boolean updateOn = false;
+
+    LocationRequest locationRequest;
+
+    LocationCallback locationCallBack;
+
+    FusedLocationProviderClient fusedLocationProviderClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +104,93 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         Configuration.getInstance().load(getApplicationContext(),
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         setContentView(R.layout.activity_main);
+        map = findViewById(R.id.carte);
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(1000 * DEFAULT_UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(1000 * FAST_UPDATE_INTERVAL);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        startLocationUpdates();
+        locationCallBack = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                updateUIValues(locationResult.getLastLocation());
+            }
+        };
+        updateGPS();
+    }
+
+    private void stopLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallBack);
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null);
+        updateGPS();
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d(TAG, String.valueOf(permissions.length));
+        Log.d(TAG, "permission : " +permissions[0]);
+        switch (requestCode) {
+            case PERMISSIONS_FINE_LOCATION:
+                Log.d(TAG, "grantResults : " +grantResults[0]);
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "grantResults[0] = "+ PackageManager.PERMISSION_GRANTED);
+                    updateGPS();
+                    Log.d(TAG, "GPS UPDATED");
+
+                } else {
+                    Toast.makeText(this, "This app requires permission to be granted in order to work properly", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Need Permission");
+                }
+                break;
+            default:
+                Log.d(TAG, "Permission Refused");
+                break;
+        }
+
+    }
+
+    private void updateGPS(){
+
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "Permission Granted");
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        Log.d(TAG, "Location is not null");
+                        updateUIValues(location);
+                    } else {
+                        Log.d(TAG, "Location is null");
+                    }
+                }
+            });
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+            }
+        }
+    }
+
+    private void updateUIValues(Location location) {
 
         // On récupère le layout de la map dans le activity_main.xml
         map = findViewById(R.id.carte);
