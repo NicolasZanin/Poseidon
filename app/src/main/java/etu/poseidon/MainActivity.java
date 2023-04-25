@@ -3,6 +3,9 @@ package etu.poseidon;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableContainer;
 import android.os.Bundle;
 
 import org.osmdroid.api.IMapController;
@@ -10,10 +13,24 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayItem;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private MapView map;
     private IMapController gestionnaireMap;
+
+    private void ajouterPoint(double x, double y) {
+        List<Overlay> listPointMap = map.getOverlays();
+        Drawable drawable = new DrawableContainer();
+        GeoPoint pointAAdd = new GeoPoint(x, y);
+        Marker marker = new Marker(map);
+        marker.setPosition(pointAAdd);
+        listPointMap.add(marker);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Pour mettre le niveau de zoom à 20.0
         gestionnaireMap.setZoom(20.0);
+
+        ajouterPoint(43.65020, 7.00517);
+        ajouterPoint(43.65010, 7.00517);
+        ajouterPoint(43.65000, 7.00517);
+        ajouterPoint(43.64990, 7.00517);
     }
 
     @Override
