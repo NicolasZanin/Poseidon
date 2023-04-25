@@ -4,9 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import android.app.AppComponentFactory;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.Button;
@@ -15,16 +16,16 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsDisplay;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.OverlayItem;
 
+import java.io.File;
 import java.util.List;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import etu.poseidon.models.Poi;
 import etu.poseidon.webservices.pois.PoiApiClient;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
     private void ajouterPoint(double x, double y) {
         List<Overlay> listPointMap = map.getOverlays();
-        Drawable drawable = new DrawableContainer();
         GeoPoint pointAAdd = new GeoPoint(x, y);
         Marker marker = new Marker(map);
         marker.setPosition(pointAAdd);
@@ -60,8 +60,13 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         // Récupère la map en ligne
         map.setTileSource(TileSourceFactory.MAPNIK);
 
+
         // Active les zooms
-        map.setBuiltInZoomControls(true);
+        map.getZoomController().activate();
+        CustomZoomButtonsDisplay custom = map.getZoomController().getDisplay();
+        custom.setPositions(false,
+                CustomZoomButtonsDisplay.HorizontalPosition.RIGHT,
+                CustomZoomButtonsDisplay.VerticalPosition.CENTER);
 
         // Crée le point de départ de classe GeoPoint qu'on pourra personnalisé
         // par la suite (avantage du geoPoint) et doit être utilisé par le gestionnaire de la map
@@ -76,11 +81,6 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
         // Pour mettre le niveau de zoom à 20.0
         gestionnaireMap.setZoom(20.0);
-
-        ajouterPoint(43.65020, 7.00517);
-        ajouterPoint(43.65010, 7.00517);
-        ajouterPoint(43.65000, 7.00517);
-        ajouterPoint(43.64990, 7.00517);
         // Button to open weather condition creator
         Button buttonWeatherConditionCreator = findViewById(R.id.button_weather_condition_creator);
         buttonWeatherConditionCreator.setOnClickListener(v -> {
@@ -140,9 +140,16 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         });
     }
 
+    /**
+     * Méthode pour ajouter des points
+     * @param poi Point of interest, le point à ajouter
+     */
     private void addPOI(Poi poi) {
+        // On crée un GeoPoint qui contient une latitude et une longitude
         GeoPoint poiPosition = new GeoPoint(poi.getLatitude(), poi.getLongitude());
+        // On crée une icone
         Marker poiMarker = new Marker(map);
+        // On paramètre la position de l'icone avec le Geopoint créer auparavant
         poiMarker.setPosition(poiPosition);
 
         // Set resource icon dynamically with poi.getType()
@@ -150,22 +157,22 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         Drawable poiIcon = getResources().getDrawable(poiIconId);
         poiMarker.setIcon(poiIcon);
 
+        // On récupère la liste des points de la map et on ajoute le point sur cette liste pour
+        // ajouter sur la map
         map.getOverlays().add(poiMarker);
 
+        // On ajoute un événement quand on clique sur l'icone ajouté
         poiMarker.setOnMarkerClickListener((marker, mapView) -> {
             openFragmentWeatherConditionUpdater(poi);
             return false;
         });
     }
-
-    private void removeAllPOIs(MapView map) {
-        List<Marker> markers = new ArrayList<>();
-        for (Overlay overlay : map.getOverlays()) {
-            if (overlay instanceof Marker) {
-                markers.add((Marker) overlay);
-            }
-        }
-        map.getOverlays().removeAll(markers);
+    /**
+     * Supprime tous les points de la carte
+     */
+    private void removeAllPOIs() {
+        // Vide la liste des points de la map
+        map.getOverlays().clear();
         map.invalidate();
     }
 
@@ -179,13 +186,13 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
     @Override
     public void onWeatherConditionDeleted() {
-        removeAllPOIs(map);
+        removeAllPOIs();
         loadAllPOIs();
     }
 
     @Override
     public void onWeatherConditionCreated() {
-        removeAllPOIs(map);
+        removeAllPOIs();
         loadAllPOIs();
     }
 }
