@@ -35,15 +35,7 @@ public class PictureFragment extends Fragment{
             }
         });
 
-        if (ContextCompat.checkSelfPermission( getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions( getActivity(),
-                                                new String[] {Manifest.permission.CAMERA},
-                                                IPuctureActivity.REQUEST_CAMERA);
-        } else { //permission still GRANTED
-            takePicture();
-        }
         return rootView;
-
 }
     void takePicture() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

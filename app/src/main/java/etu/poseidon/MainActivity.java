@@ -248,8 +248,12 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     private void updateUIValues(Location location) {
         // Button to open weather condition creator
         Button buttonWeatherConditionCreator = findViewById(R.id.button_weather_condition_creator);
+        Button button_profile = findViewById(R.id.button_profile);
         buttonWeatherConditionCreator.setOnClickListener(v -> {
             openFragmentWeatherConditionCreator();
+        });
+        button_profile.setOnClickListener(v -> {
+            openFragmentProfile();
         });
 
         // Load all POIs on create
@@ -274,6 +278,13 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionCreatorFragment).commit();
         // TODO : passer les coordonnées GPS actuelles de la map, pour l'instant les pois sont crées en (43.65020, 7.00517) (comme la map)
         openedFragment = weatherConditionCreatorFragment;
+    }
+
+    private void openFragmentProfile() {
+        closeOpenedFragment();
+        ProfileFragment profileFragment = new ProfileFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) profileFragment).commit();
+        openedFragment = profileFragment;
     }
 
     private void openFragmentWeatherConditionUpdater(Poi poi){
