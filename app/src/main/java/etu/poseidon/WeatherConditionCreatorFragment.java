@@ -1,6 +1,7 @@
 package etu.poseidon;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -35,6 +36,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
         void onWeatherConditionCreated();
     }
 
+    private static final String ARG_CURRENT_LOCATION = "current_location_param";
+    private Location currentLocation;
     private final int BUTTONS_PER_ROW = 3;
     private final float BUTTONS_DP_SIZE = 90f;
 
@@ -45,6 +48,22 @@ public class WeatherConditionCreatorFragment extends Fragment {
 
     public WeatherConditionCreatorFragment() {
         // Required empty public constructor
+    }
+
+    public static WeatherConditionCreatorFragment newInstance(Location location) {
+        WeatherConditionCreatorFragment fragment = new WeatherConditionCreatorFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_CURRENT_LOCATION, location);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            currentLocation = getArguments().getParcelable(ARG_CURRENT_LOCATION);
+        }
     }
 
     @Override
@@ -163,8 +182,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
 
     private void handleConfirmButton(){
         Poi newPoi = new Poi();
-        newPoi.setLatitude(43.65020);
-        newPoi.setLongitude(7.00517);
+        newPoi.setLatitude(currentLocation.getLatitude());
+        newPoi.setLongitude(currentLocation.getLongitude());
         newPoi.setWeatherCondition(getSelectedWeatherCondition());
         newPoi.setPerimeter(perimeter);
 
