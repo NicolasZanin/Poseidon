@@ -74,9 +74,7 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     public static final int FAST_UPDATE_INTERVAL = 5;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
-
     private Bitmap picture;
-    private PictureFragment pictureFragment;
 
 
     TextView tv_lat, tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address;
@@ -138,15 +136,6 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
             }
         };
         updateGPS();
-
-        pictureFragment = (PictureFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_picture);
-        if (pictureFragment == null) {
-            pictureFragment = new PictureFragment();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_picture, pictureFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        }
     }
 
     private void stopLocationUpdates() {
@@ -203,24 +192,6 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CAMERA) {
-            if (resultCode == RESULT_OK) {
-                picture = (Bitmap) data.getExtras().get("data");
-                pictureFragment.setPicture(picture);
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast toast = Toast.makeText(this, "No picture taken", Toast.LENGTH_SHORT);
-                toast.show();
-            }else {
-                Toast toast = Toast.makeText(this, "Action failed", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
     private void updateGPS(){
 
 
@@ -270,6 +241,26 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     public void onResume() {
         super.onResume();
         map.onResume();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("onActivityResult");
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CAMERA) {
+            if (resultCode == RESULT_OK) {
+                picture = (Bitmap) data.getExtras().get("data");
+                PictureFragment pictureFragment = (PictureFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_picture);
+                pictureFragment.setPicture(picture);
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast toast = Toast.makeText(this, "No picture taken", Toast.LENGTH_SHORT);
+                toast.show();
+            }else {
+                Toast toast = Toast.makeText(this, "Action failed", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void openFragmentWeatherConditionCreator() {

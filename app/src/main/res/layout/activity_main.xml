@@ -44,12 +44,12 @@
         />
 
     <FrameLayout
-        android:id="@+id/fragment_picture"
+        android:id="@+id/fragment_profile"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/button_weather_condition_creator"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <FrameLayout

@@ -1,10 +1,20 @@
 package etu.poseidon;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
+import static etu.poseidon.IPuctureActivity.REQUEST_CAMERA;
+
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.ArrayMap;
 import android.util.Log;
@@ -42,6 +52,9 @@ public class WeatherConditionCreatorFragment extends Fragment {
     private int perimeter = 10;
 
     private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
+
+    private Bitmap picture;
+    private PictureFragment pictureFragment;
 
     public WeatherConditionCreatorFragment() {
         // Required empty public constructor
@@ -83,6 +96,12 @@ public class WeatherConditionCreatorFragment extends Fragment {
 
         TextView closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(v -> closeFragment());
+
+        pictureFragment = new PictureFragment();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_picture, pictureFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
 
         // Inflate the layout for this fragment
         return view;
@@ -206,6 +225,49 @@ public class WeatherConditionCreatorFragment extends Fragment {
         } else {
             throw new RuntimeException(context.toString() + " must implement OnWeatherConditionCreatedListener");
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("onActivityResult");
+        Context context = getContext();
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CAMERA) {
+            if (resultCode == RESULT_OK) {
+                picture = (Bitmap) data.getExtras().get("data");
+                pictureFragment.setPicture(picture);
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast toast = Toast.makeText(context, "No picture taken", Toast.LENGTH_SHORT);
+                toast.show();
+            }else {
+                Toast toast = Toast.makeText(context, "Action failed", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Context context = getContext();
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d(TAG, String.valueOf(permissions.length));
+        Log.d(TAG, "permission : " +permissions[0]);
+        switch (requestCode) {
+            case REQUEST_CAMERA:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast toast = Toast.makeText(context, "CAMERA Permission granted", Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    Toast toast = Toast.makeText(context, "CAMERA Permission refused", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                break;
+            default:
+                Log.d(TAG, "Permission Refused");
+                break;
+        }
+
     }
 
     @Override
