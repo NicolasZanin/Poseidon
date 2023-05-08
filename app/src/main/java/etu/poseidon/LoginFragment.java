@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -23,12 +24,6 @@ import com.google.android.gms.tasks.Task;
 import java.util.Objects;
 
 public class LoginFragment extends Fragment {
-
-    public interface LoginListener {
-        void onLogIn(GoogleSignInAccount account);
-    }
-
-    private LoginFragment.LoginListener mListener;
 
     private static final int RC_SIGN_IN = 11;
 
@@ -94,27 +89,12 @@ public class LoginFragment extends Fragment {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            mListener.onLogIn(account);
+            Toast.makeText(requireContext(), "Connexion réussie, bienvenue !", Toast.LENGTH_SHORT).show();
+            closeFragment();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             System.out.println("signInResult:failed code=" + e.getStatusCode());
         }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof LoginFragment.LoginListener) {
-            mListener = (LoginFragment.LoginListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement LoginListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 }

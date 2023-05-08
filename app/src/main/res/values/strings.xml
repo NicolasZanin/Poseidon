@@ -31,4 +31,10 @@
     <string name="weather_condition_updater_close">Fermer</string>
     <string name="weather_condition_updater_succefully_deleted">Condition météorologique supprimée !</string>
     <string name="weather_condition_updater_button_information">Si l\'indication météorologique n\'est plus d\'actualité, cliquez sur le bouton \'Terminer\' afin de la supprimer.</string>
+    <!-- Picture fragment -->
+    <string name="fragment_picture_take_picture">Prendre une photo</string>
+    <string name="fragment_picture_retake_picture">Reprendre</string>
+    <string name="fragment_picture_remove_picture">Supprimer</string>
+    <string name="fragment_picture_photo_text_indicator">Appuyez sur le bouton ci-dessous pour ajouter une photo de la condition météorologique</string>
+    <string name="fragment_picture_photo">Photo :</string>
 </resources>

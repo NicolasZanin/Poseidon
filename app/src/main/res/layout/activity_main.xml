@@ -43,6 +43,15 @@
         />
 
     <FrameLayout
+        android:id="@+id/fragment_profile"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <FrameLayout
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

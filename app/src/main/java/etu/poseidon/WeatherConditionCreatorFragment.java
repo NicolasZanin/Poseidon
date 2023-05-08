@@ -1,11 +1,21 @@
 package etu.poseidon;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
+import static etu.poseidon.IPuctureActivity.REQUEST_CAMERA;
+
 import android.content.Context;
 import android.location.Location;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.ArrayMap;
 import android.util.Log;
@@ -50,6 +60,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
     private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
 
     private GoogleSignInAccount account;
+    private Bitmap picture;
+    private PictureFragment pictureFragment;
 
     public WeatherConditionCreatorFragment() {
         // Required empty public constructor
@@ -109,6 +121,12 @@ public class WeatherConditionCreatorFragment extends Fragment {
 
         TextView closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(v -> closeFragment());
+
+        pictureFragment = new PictureFragment();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_picture, pictureFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
 
         // Inflate the layout for this fragment
         return view;
