@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -35,6 +36,7 @@ import java.util.List;
 import etu.poseidon.R;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
 import android.app.AppComponentFactory;
@@ -61,7 +63,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener, WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener {
+public class MainActivity extends AppCompatActivity implements WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener, WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener, IPuctureActivity {
     private MapView map;
     private IMapController gestionnaireMap;
 
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     public static final int FAST_UPDATE_INTERVAL = 5;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
+    private Bitmap picture;
 
 
     TextView tv_lat, tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address;
@@ -173,6 +176,15 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
                     Log.d(TAG, "Need Permission");
                 }
                 break;
+            case REQUEST_CAMERA:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast toast = Toast.makeText(this, "CAMERA Permission granted", Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    Toast toast = Toast.makeText(this, "CAMERA Permission refused", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                break;
             default:
                 Log.d(TAG, "Permission Refused");
                 break;
@@ -207,8 +219,12 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     private void updateUIValues(Location location) {
         // Button to open weather condition creator
         Button buttonWeatherConditionCreator = findViewById(R.id.button_weather_condition_creator);
+        Button button_profile = findViewById(R.id.button_profile);
         buttonWeatherConditionCreator.setOnClickListener(v -> {
             openFragmentWeatherConditionCreator();
+        });
+        button_profile.setOnClickListener(v -> {
+            openFragmentProfile();
         });
 
         // Load all POIs on create
@@ -227,12 +243,39 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         map.onResume();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("onActivityResult");
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CAMERA) {
+            if (resultCode == RESULT_OK) {
+                picture = (Bitmap) data.getExtras().get("data");
+                PictureFragment pictureFragment = (PictureFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_picture);
+                pictureFragment.setPicture(picture);
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast toast = Toast.makeText(this, "No picture taken", Toast.LENGTH_SHORT);
+                toast.show();
+            }else {
+                Toast toast = Toast.makeText(this, "Action failed", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     private void openFragmentWeatherConditionCreator() {
         closeOpenedFragment();
         WeatherConditionCreatorFragment weatherConditionCreatorFragment = new WeatherConditionCreatorFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionCreatorFragment).commit();
         // TODO : passer les coordonnées GPS actuelles de la map, pour l'instant les pois sont crées en (43.65020, 7.00517) (comme la map)
         openedFragment = weatherConditionCreatorFragment;
+    }
+
+    private void openFragmentProfile() {
+        closeOpenedFragment();
+        ProfileFragment profileFragment = new ProfileFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) profileFragment).commit();
+        openedFragment = profileFragment;
     }
 
     private void openFragmentWeatherConditionUpdater(Poi poi){

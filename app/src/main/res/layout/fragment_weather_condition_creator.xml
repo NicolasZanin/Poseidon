@@ -15,6 +15,16 @@
     tools:context=".WeatherConditionCreatorFragment"
     >
 
+    <FrameLayout
+        android:id="@+id/fragment_picture"
+        android:layout_width="149dp"
+        android:layout_height="127dp"
+        app:layout_constraintBottom_toTopOf="@+id/conditions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label_select_weather"
+        app:layout_constraintVertical_bias="0.0" />
+
     <TextView
         android:id="@+id/label_select_weather"
         android:layout_width="wrap_content"
@@ -36,11 +46,12 @@
         android:id="@+id/conditions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="132dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/label_select_weather"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_select_weather" />
 
     <TextView
         android:id="@+id/range_value"
