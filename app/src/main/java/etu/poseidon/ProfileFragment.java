@@ -33,6 +33,7 @@ import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
 
+    private final String TAG = "POSEIDON " + getClass().getSimpleName();
     private TextView numberOfEventsTextView, noEventsTextView;
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount loggedInAccount;
@@ -113,7 +114,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Poi>> call, Throwable t) {
-                Log.e("TEST","Error: " + t.getMessage());
+                Log.e(TAG,"Error: " + t.getMessage());
             }
         });
     }

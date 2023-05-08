@@ -25,8 +25,8 @@ import java.util.Objects;
 
 public class LoginFragment extends Fragment {
 
+    private final String TAG = "POSEIDON " + getClass().getSimpleName();
     private static final int RC_SIGN_IN = 11;
-
     GoogleSignInClient mGoogleSignInClient;
 
     public LoginFragment() {
@@ -94,7 +94,7 @@ public class LoginFragment extends Fragment {
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            System.out.println("signInResult:failed code=" + e.getStatusCode());
+            Log.e(TAG, "signInResult:failed code=" + e.getStatusCode());
         }
     }
 }
