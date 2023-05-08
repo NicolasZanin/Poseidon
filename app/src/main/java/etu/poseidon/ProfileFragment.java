@@ -11,10 +11,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.squareup.picasso.Picasso;
+
 import java.util.Locale;
+import java.util.concurrent.Executor;
 
 public class ProfileFragment extends Fragment {
 
@@ -22,6 +34,20 @@ public class ProfileFragment extends Fragment {
     private ImageView imgProfil;
     private TextView txtNomProfil, txtNombreEvenements;
     private ListView listHistorique;
+
+    GoogleSignInClient mGoogleSignInClient;
+    GoogleSignInAccount loggedInAccount;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this.requireContext(), gso);
+        loggedInAccount = GoogleSignIn.getLastSignedInAccount(this.requireContext());
+    }
 
     // Méthode appelée lors de la création du fragment
     @Override
@@ -41,20 +67,23 @@ public class ProfileFragment extends Fragment {
         btnDeconnexion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO : Déconnexion de l'utilisateur
-                Toast.makeText(getActivity(), "Déconnexion", Toast.LENGTH_SHORT).show();
+                signOut();
             }
         });
 
-        // Récupération de l'image de profil depuis les ressources
-        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.profil, null);
-        imgProfil.setImageDrawable(drawable);
+        // Photo de profil - Récupération depuis Google ou récupération de l'image de profil de base depuis les ressources si inexistante chez Google
+        if(loggedInAccount.getPhotoUrl() == null) {
+            Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.profil, null);
+            imgProfil.setImageDrawable(drawable);
+        } else {
+            Picasso.get().load(loggedInAccount.getPhotoUrl()).into(imgProfil);
+        }
 
         // Affichage du nom de profil
-        txtNomProfil.setText("Julian ZAZIN");
+        txtNomProfil.setText(loggedInAccount.getDisplayName());
 
         // Affichage du nombre d'événements notifiés
-        int nbEvenements = 10;
+        int nbEvenements = 0;
         String texteNbEvenements = String.format(Locale.getDefault(), "%d événements notifiés", nbEvenements);
         txtNombreEvenements.setText(texteNbEvenements);
 
@@ -65,6 +94,17 @@ public class ProfileFragment extends Fragment {
     }
     private void closeFragment(){
         requireActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+    }
+
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    Toast.makeText(requireContext(), "Déconnexion réussie, à bientôt !", Toast.LENGTH_SHORT).show();
+                    closeFragment();
+                }
+            });
     }
 }
 

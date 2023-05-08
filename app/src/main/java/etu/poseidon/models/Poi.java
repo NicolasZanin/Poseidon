@@ -25,19 +25,12 @@ public class Poi implements Parcelable {
     private boolean isFinished;
     @SerializedName("perimeter")
     private double perimeter;
+    @SerializedName("creatorEmail")
+    private String creatorEmail;
+    @SerializedName("creatorFullname")
+    private String creatorFullname;
 
     public Poi() {
-    }
-
-    public Poi(String id, double latitude, double longitude, WeatherCondition weatherCondition, String createdAt, String updatedAt, boolean isFinished, double perimeter) {
-        this.id = id;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.weatherCondition = weatherCondition;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.isFinished = isFinished;
-        this.perimeter = perimeter;
     }
 
     public String getId() {
@@ -104,6 +97,22 @@ public class Poi implements Parcelable {
         this.updatedAt = updatedAt;
     }
 
+    public String getCreatorEmail() {
+        return creatorEmail;
+    }
+
+    public void setCreatorEmail(String creatorEmail) {
+        this.creatorEmail = creatorEmail;
+    }
+
+    public String getCreatorFullname() {
+        return creatorFullname;
+    }
+
+    public void setCreatorFullname(String creatorFullname) {
+        this.creatorFullname = creatorFullname;
+    }
+
     @Override
     public String toString() {
         return "Poi{" +
@@ -115,6 +124,8 @@ public class Poi implements Parcelable {
                 ", updatedAt='" + updatedAt + '\'' +
                 ", isFinished=" + isFinished +
                 ", perimeter=" + perimeter +
+                ", creatorEmail='" + creatorEmail + '\'' +
+                ", creatorFullname='" + creatorFullname + '\'' +
                 '}';
     }
 
@@ -127,6 +138,8 @@ public class Poi implements Parcelable {
         updatedAt = in.readString();
         isFinished = in.readByte() != 0;
         perimeter = in.readDouble();
+        creatorEmail = in.readString();
+        creatorFullname = in.readString();
     }
 
     @Override
@@ -139,6 +152,8 @@ public class Poi implements Parcelable {
         dest.writeString(updatedAt);
         dest.writeByte((byte) (isFinished ? 1 : 0));
         dest.writeDouble(perimeter);
+        dest.writeString(creatorEmail);
+        dest.writeString(creatorFullname);
     }
 
     @Override

@@ -39,8 +39,16 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
+    // Google auth
+    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+
+    // Google maps for GPS
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+
+    // Picasso for images loading
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
 }

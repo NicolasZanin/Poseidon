@@ -6,6 +6,7 @@ import static android.content.ContentValues.TAG;
 import static etu.poseidon.IPuctureActivity.REQUEST_CAMERA;
 
 import android.content.Context;
+import android.location.Location;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -29,6 +30,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
 import java.util.Locale;
 import java.util.Map;
 
@@ -45,6 +49,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
         void onWeatherConditionCreated();
     }
 
+    private static final String ARG_CURRENT_LOCATION = "current_location_param";
+    private Location currentLocation;
     private final int BUTTONS_PER_ROW = 3;
     private final float BUTTONS_DP_SIZE = 90f;
 
@@ -53,11 +59,30 @@ public class WeatherConditionCreatorFragment extends Fragment {
 
     private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
 
+    private GoogleSignInAccount account;
     private Bitmap picture;
     private PictureFragment pictureFragment;
 
     public WeatherConditionCreatorFragment() {
         // Required empty public constructor
+    }
+
+    public static WeatherConditionCreatorFragment newInstance(Location location) {
+        WeatherConditionCreatorFragment fragment = new WeatherConditionCreatorFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_CURRENT_LOCATION, location);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            currentLocation = getArguments().getParcelable(ARG_CURRENT_LOCATION);
+        }
+
+        account = GoogleSignIn.getLastSignedInAccount(getContext());
     }
 
     @Override
@@ -182,10 +207,12 @@ public class WeatherConditionCreatorFragment extends Fragment {
 
     private void handleConfirmButton(){
         Poi newPoi = new Poi();
-        newPoi.setLatitude(43.65020);
-        newPoi.setLongitude(7.00517);
+        newPoi.setLatitude(currentLocation.getLatitude());
+        newPoi.setLongitude(currentLocation.getLongitude());
         newPoi.setWeatherCondition(getSelectedWeatherCondition());
         newPoi.setPerimeter(perimeter);
+        newPoi.setCreatorEmail(account.getEmail());
+        newPoi.setCreatorFullname(account.getDisplayName());
 
         PoiApiClient.getInstance().createPoi(newPoi, new Callback<Poi>() {
             @Override
@@ -225,49 +252,6 @@ public class WeatherConditionCreatorFragment extends Fragment {
         } else {
             throw new RuntimeException(context.toString() + " must implement OnWeatherConditionCreatedListener");
         }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("onActivityResult");
-        Context context = getContext();
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CAMERA) {
-            if (resultCode == RESULT_OK) {
-                picture = (Bitmap) data.getExtras().get("data");
-                pictureFragment.setPicture(picture);
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast toast = Toast.makeText(context, "No picture taken", Toast.LENGTH_SHORT);
-                toast.show();
-            }else {
-                Toast toast = Toast.makeText(context, "Action failed", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Context context = getContext();
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(TAG, String.valueOf(permissions.length));
-        Log.d(TAG, "permission : " +permissions[0]);
-        switch (requestCode) {
-            case REQUEST_CAMERA:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast toast = Toast.makeText(context, "CAMERA Permission granted", Toast.LENGTH_SHORT);
-                    toast.show();
-                } else {
-                    Toast toast = Toast.makeText(context, "CAMERA Permission refused", Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-                break;
-            default:
-                Log.d(TAG, "Permission Refused");
-                break;
-        }
-
     }
 
     @Override

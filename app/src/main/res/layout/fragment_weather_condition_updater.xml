@@ -85,12 +85,23 @@
         />
 
     <TextView
+        android:id="@+id/added_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/weather_condition_updater_added_by"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/last_update"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="10dp"
+        />
+
+    <TextView
         android:id="@+id/click_if_is_finished"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/weather_condition_updater_button_information"
         android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/last_update"
+        app:layout_constraintTop_toBottomOf="@id/added_by"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp"
         android:layout_marginStart="10dp"

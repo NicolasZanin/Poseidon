@@ -22,8 +22,7 @@
         android:text="Déconnexion"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
         />
 
     <TextView
@@ -36,7 +35,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="10dp"
-        android:layout_marginTop="10dp"
         />
 
     <!-- Image de profil -->

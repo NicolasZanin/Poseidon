@@ -47,6 +47,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.Button;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -69,24 +72,17 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
     private Fragment openedFragment;
 
-    private final String TAG = "JULIAN " + getClass().getSimpleName();
+    private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final int DEFAULT_UPDATE_INTERVAL = 30;
     public static final int FAST_UPDATE_INTERVAL = 5;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
     private Bitmap picture;
 
-
-    TextView tv_lat, tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address;
-    Switch sw_gps, sw_locationsupdates;
-
-    boolean updateOn = false;
-
     LocationRequest locationRequest;
-
     LocationCallback locationCallBack;
-
     FusedLocationProviderClient fusedLocationProviderClient;
+    Location currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
         // Récupère la map en ligne
         map.setTileSource(TileSourceFactory.MAPNIK);
-
 
         // Active les zooms
         map.getZoomController().activate();
@@ -132,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                updateUIValues(locationResult.getLastLocation());
+                updateCurrentLocation(locationResult.getLastLocation());
             }
         };
         updateGPS();
@@ -193,8 +188,6 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     }
 
     private void updateGPS(){
-
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Permission Granted");
@@ -202,8 +195,8 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
                 @Override
                 public void onSuccess(Location location) {
                     if (location != null) {
-                        Log.d(TAG, "Location is not null");
-                        updateUIValues(location);
+                        Log.d(TAG, "Location is not null : " + location.getLatitude() + " " + location.getLongitude());
+                        updateCurrentLocation(location);
                     } else {
                         Log.d(TAG, "Location is null");
                     }
@@ -216,18 +209,30 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         }
     }
 
-    private void updateUIValues(Location location) {
+    private void updateCurrentLocation(Location location) {
+        currentLocation = location;
+        GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+        gestionnaireMap.setCenter(newLocation);
+        gestionnaireMap.setZoom(20.0);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(GoogleSignIn.getLastSignedInAccount(this) != null)
+            Log.d(TAG,"Logged account: " + GoogleSignIn.getLastSignedInAccount(this).getEmail());
+        else
+            Log.d(TAG,"No logged account");
+
         // Button to open weather condition creator
         Button buttonWeatherConditionCreator = findViewById(R.id.button_weather_condition_creator);
-        Button button_profile = findViewById(R.id.button_profile);
-        buttonWeatherConditionCreator.setOnClickListener(v -> {
-            openFragmentWeatherConditionCreator();
-        });
-        button_profile.setOnClickListener(v -> {
-            openFragmentProfile();
-        });
+        buttonWeatherConditionCreator.setOnClickListener(v -> openWeatherConditionCreatorFragment());
 
-        // Load all POIs on create
+        // Button to open profile
+        Button buttonProfile = findViewById(R.id.button_profile);
+        buttonProfile.setOnClickListener(v -> openProfileFragment());
+
         loadAllPOIs();
     }
 
@@ -245,7 +250,6 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("onActivityResult");
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CAMERA) {
             if (resultCode == RESULT_OK) {
@@ -263,31 +267,6 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void openFragmentWeatherConditionCreator() {
-        closeOpenedFragment();
-        WeatherConditionCreatorFragment weatherConditionCreatorFragment = new WeatherConditionCreatorFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionCreatorFragment).commit();
-        // TODO : passer les coordonnées GPS actuelles de la map, pour l'instant les pois sont crées en (43.65020, 7.00517) (comme la map)
-        openedFragment = weatherConditionCreatorFragment;
-    }
-
-    private void openFragmentProfile() {
-        closeOpenedFragment();
-        ProfileFragment profileFragment = new ProfileFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) profileFragment).commit();
-        openedFragment = profileFragment;
-    }
-
-    private void openFragmentWeatherConditionUpdater(Poi poi){
-        closeOpenedFragment();
-        WeatherConditionUpdaterFragment weatherConditionUpdaterFragment = new WeatherConditionUpdaterFragment();
-        Bundle args = new Bundle();
-        args.putParcelable("poi_param", poi);
-        weatherConditionUpdaterFragment.setArguments(args);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionUpdaterFragment).commit();
-        openedFragment = weatherConditionUpdaterFragment;
-    }
-
     private void loadAllPOIs(){
         PoiApiClient.getInstance().getPoiList(new Callback<List<Poi>>() {
             @Override
@@ -302,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
             @Override
             public void onFailure(Call<List<Poi>> call, Throwable t) {
-                System.out.println("Error: " + t.getMessage());
+                Log.e(TAG,"Error: " + t.getMessage());
             }
         });
     }
@@ -330,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
         // On ajoute un événement quand on clique sur l'icone ajouté
         poiMarker.setOnMarkerClickListener((marker, mapView) -> {
-            openFragmentWeatherConditionUpdater(poi);
+            openWeatherConditionUpdaterFragment(poi);
             return false;
         });
     }
@@ -343,6 +322,47 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         map.invalidate();
     }
 
+    private void openWeatherConditionUpdaterFragment(Poi poi){
+        closeOpenedFragment();
+        WeatherConditionUpdaterFragment weatherConditionUpdaterFragment = new WeatherConditionUpdaterFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("poi_param", poi);
+        weatherConditionUpdaterFragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionUpdaterFragment).commit();
+        openedFragment = weatherConditionUpdaterFragment;
+    }
+
+    private void openWeatherConditionCreatorFragment(){
+        if(GoogleSignIn.getLastSignedInAccount(this) != null){
+            closeOpenedFragment();
+            WeatherConditionCreatorFragment weatherConditionCreatorFragment = new WeatherConditionCreatorFragment();
+            Bundle args = new Bundle();
+            args.putParcelable("current_location_param", currentLocation);
+            weatherConditionCreatorFragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionCreatorFragment).commit();
+            openedFragment = weatherConditionCreatorFragment;
+        } else {
+            openLoginFragment();
+        }
+    }
+
+    private void openProfileFragment(){
+        if(GoogleSignIn.getLastSignedInAccount(this) != null){
+            closeOpenedFragment();
+            ProfileFragment profileFragment = new ProfileFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) profileFragment).commit();
+            openedFragment = profileFragment;
+        } else {
+            openLoginFragment();
+        }
+    }
+
+    private void openLoginFragment(){
+        closeOpenedFragment();
+        LoginFragment loginFragment = new LoginFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) loginFragment).commit();
+        openedFragment = loginFragment;
+    }
 
     private void closeOpenedFragment() {
         if (openedFragment != null) {
