@@ -1,18 +1,10 @@
 package etu.poseidon;
 
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
-import static android.content.ContentValues.TAG;
-import static etu.poseidon.IPuctureActivity.REQUEST_CAMERA;
-
 import android.content.Context;
 import android.location.Location;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,8 +42,10 @@ public class WeatherConditionCreatorFragment extends Fragment {
         void onWeatherConditionCreated();
     }
 
-    private static final String ARG_CURRENT_LOCATION = "current_location_param";
-    private Location currentLocation;
+    private static final String ARG_REAL_LOCATION = "real_location_param";
+    private static final String ARG_MAP_LOCATION = "map_location_param";
+    private Location currentRealLocation;
+    private Location currentMapLocation;
     private final int BUTTONS_PER_ROW = 3;
     private final float BUTTONS_DP_SIZE = 90f;
 
@@ -63,23 +58,18 @@ public class WeatherConditionCreatorFragment extends Fragment {
     private Bitmap picture;
     private PictureFragment pictureFragment;
 
+    private RadioButton realLocationButton;
+
     public WeatherConditionCreatorFragment() {
         // Required empty public constructor
-    }
-
-    public static WeatherConditionCreatorFragment newInstance(Location location) {
-        WeatherConditionCreatorFragment fragment = new WeatherConditionCreatorFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_CURRENT_LOCATION, location);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            currentLocation = getArguments().getParcelable(ARG_CURRENT_LOCATION);
+            currentRealLocation = getArguments().getParcelable(ARG_REAL_LOCATION);
+            currentMapLocation = getArguments().getParcelable(ARG_MAP_LOCATION);
         }
 
         account = GoogleSignIn.getLastSignedInAccount(getContext());
@@ -127,6 +117,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
         transaction.replace(R.id.fragment_picture, pictureFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+
+        realLocationButton = view.findViewById(R.id.radio_gps);
 
         // Inflate the layout for this fragment
         return view;
@@ -207,8 +199,13 @@ public class WeatherConditionCreatorFragment extends Fragment {
 
     private void handleConfirmButton(){
         Poi newPoi = new Poi();
-        newPoi.setLatitude(currentLocation.getLatitude());
-        newPoi.setLongitude(currentLocation.getLongitude());
+        if(realLocationButton.isChecked()) {
+            newPoi.setLatitude(currentRealLocation.getLatitude());
+            newPoi.setLongitude(currentRealLocation.getLongitude());
+        } else {
+            newPoi.setLatitude(currentMapLocation.getLatitude());
+            newPoi.setLongitude(currentMapLocation.getLongitude());
+        }
         newPoi.setWeatherCondition(getSelectedWeatherCondition());
         newPoi.setPerimeter(perimeter);
         newPoi.setCreatorEmail(account.getEmail());

@@ -6,19 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -26,29 +19,18 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
-import java.io.IOException;
 import java.util.List;
 
-import etu.poseidon.R;
-
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
-import android.app.AppComponentFactory;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -66,7 +48,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener, WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener, IPuctureActivity {
+public class MainActivity extends AppCompatActivity implements
+        WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
+        WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
+        ProfileHistoryAdapter.OnLocateButtonClickedListener,
+        IPuctureActivity {
     private MapView map;
     private IMapController gestionnaireMap;
 
@@ -82,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     LocationRequest locationRequest;
     LocationCallback locationCallBack;
     FusedLocationProviderClient fusedLocationProviderClient;
-    Location currentLocation;
+    Location currentRealLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     }
 
     private void updateCurrentLocation(Location location) {
-        currentLocation = location;
+        currentRealLocation = location;
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
         gestionnaireMap.setCenter(newLocation);
         gestionnaireMap.setZoom(20.0);
@@ -336,9 +322,19 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         if(GoogleSignIn.getLastSignedInAccount(this) != null){
             closeOpenedFragment();
             WeatherConditionCreatorFragment weatherConditionCreatorFragment = new WeatherConditionCreatorFragment();
+
             Bundle args = new Bundle();
-            args.putParcelable("current_location_param", currentLocation);
+            // Real location
+            args.putParcelable("real_location_param", currentRealLocation);
             weatherConditionCreatorFragment.setArguments(args);
+
+            // Map location
+            Location location = new Location(currentRealLocation);
+            location.setLatitude(map.getMapCenter().getLatitude());
+            location.setLongitude(map.getMapCenter().getLongitude());
+            args.putParcelable("map_location_param", location);
+            weatherConditionCreatorFragment.setArguments(args);
+
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionCreatorFragment).commit();
             openedFragment = weatherConditionCreatorFragment;
         } else {
@@ -372,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     }
 
     @Override
-    public void onWeatherConditionDeleted() {
+    public void onWeatherConditionFinished() {
         removeAllPOIs();
         loadAllPOIs();
     }
@@ -381,5 +377,14 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
     public void onWeatherConditionCreated() {
         removeAllPOIs();
         loadAllPOIs();
+    }
+
+    @Override
+    public void onLocateButtonClicked(Poi poi) {
+        closeOpenedFragment();
+        GeoPoint poiPosition = new GeoPoint(poi.getLatitude(), poi.getLongitude());
+        gestionnaireMap.setCenter(poiPosition);
+        gestionnaireMap.setZoom(20.0);
+        openWeatherConditionUpdaterFragment(poi);
     }
 }

@@ -16,6 +16,9 @@ public interface PoiApiService {
     @GET("pois")
     Call<List<Poi>> getPoiList();
 
+    @GET("pois/history/{email}")
+    Call<List<Poi>> getHistoryForUser(@Path("email") String email);
+
     @POST("pois")
     Call<Poi> createPoi(@Body Poi poi);
 

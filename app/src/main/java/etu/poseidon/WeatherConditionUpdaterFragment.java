@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import etu.poseidon.models.Poi;
 import etu.poseidon.webservices.pois.PoiApiClient;
@@ -28,7 +28,7 @@ import retrofit2.Response;
 public class WeatherConditionUpdaterFragment extends Fragment {
 
     public interface OnWeatherConditionDeletedListener {
-        void onWeatherConditionDeleted();
+        void onWeatherConditionFinished();
     }
 
     private static final String ARG_POI = "poi_param";
@@ -38,14 +38,6 @@ public class WeatherConditionUpdaterFragment extends Fragment {
 
     public WeatherConditionUpdaterFragment() {
         // Required empty public constructor
-    }
-
-    public static WeatherConditionUpdaterFragment newInstance(Poi poi) {
-        WeatherConditionUpdaterFragment fragment = new WeatherConditionUpdaterFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_POI, poi);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -62,7 +54,7 @@ public class WeatherConditionUpdaterFragment extends Fragment {
 
         TextView title = view.findViewById(R.id.title);
         int stringTitle = getResources().getIdentifier("weather_condition_updater_title", "string", getContext().getPackageName());
-        title.setText(getString(stringTitle, poiToUpdate.isFinished() ? "" : " - En cours"));
+        title.setText(getString(stringTitle, poiToUpdate.isFinished() ? " - Terminé" : " - En cours"));
 
         TextView coordinates = view.findViewById(R.id.coordinates);
         int stringCoordinates = getResources().getIdentifier("weather_condition_updater_coordinates", "string", getContext().getPackageName());
@@ -77,8 +69,10 @@ public class WeatherConditionUpdaterFragment extends Fragment {
         int stringPerimeter = getResources().getIdentifier("weather_condition_updater_perimeter", "string", getContext().getPackageName());
         perimeter.setText(getString(stringPerimeter, (int) poiToUpdate.getPerimeter()));
 
-        DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        DateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH'h'mm");
+        DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
+        inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        DateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH'h'mm", Locale.FRANCE);
+        outputFormat.setTimeZone(TimeZone.getDefault());
 
         TextView createdAt = view.findViewById(R.id.created_at);
         int stringCreatedAt = getResources().getIdentifier("weather_condition_updater_created_at", "string", getContext().getPackageName());
@@ -110,19 +104,39 @@ public class WeatherConditionUpdaterFragment extends Fragment {
         close.setOnClickListener(v -> closeFragment());
 
         Button finished = view.findViewById(R.id.finished);
-        finished.setOnClickListener(v -> handleFinishButton());
+        finished.setOnClickListener(v -> deletePoi());
+
+        TextView informationText = view.findViewById(R.id.click_if_is_finished);
+        if(poiToUpdate.isFinished()){
+            // Change information text
+            int stringFinished = getResources().getIdentifier("weather_condition_updater_button_information_already_finished", "string", getContext().getPackageName());
+            informationText.setText(getString(stringFinished));
+
+            // Set "delete" button to red background
+            finished.setBackgroundColor(getResources().getColor(R.color.red));
+        }
 
         return view;
     }
 
-    private void handleFinishButton(){
+    // Delete :
+    // If the poi is not finished and the delete button is pressed, the poi is set to finished, it will not be displayed anymore (only in creator history)
+    // If the poi is finished and the delete button is pressed, the poi is deleted definilety
+    private void deletePoi(){
+        if(poiToUpdate.isFinished()){
+            deletePoiDefinilety();
+        } else {
+            setPoiFinished();
+        }
+    }
+
+    private void deletePoiDefinilety(){
         PoiApiClient.getInstance().deletePoi(poiToUpdate.getId(), new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    int stringSuccess = getResources().getIdentifier("weather_condition_updater_succefully_deleted", "string", getContext().getPackageName());
+                    int stringSuccess = getResources().getIdentifier("weather_condition_updater_succefully_deleted_definitely", "string", getContext().getPackageName());
                     Toast.makeText(getContext(), getString(stringSuccess), Toast.LENGTH_SHORT).show();
-                    mListener.onWeatherConditionDeleted();
                     closeFragment();
                 } else {
                     int stringError = getResources().getIdentifier("global_error", "string", getContext().getPackageName());
@@ -133,6 +147,32 @@ public class WeatherConditionUpdaterFragment extends Fragment {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
+                int stringError = getResources().getIdentifier("global_error", "string", getContext().getPackageName());
+                Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
+                closeFragment();
+            }
+        });
+    }
+
+    private void setPoiFinished(){
+        poiToUpdate.setFinished(true);
+        PoiApiClient.getInstance().updatePoi(poiToUpdate.getId(), poiToUpdate, new Callback<Poi>() {
+            @Override
+            public void onResponse(Call<Poi> call, Response<Poi> response) {
+                if (response.isSuccessful()) {
+                    int stringSuccess = getResources().getIdentifier("weather_condition_updater_succefully_deleted", "string", getContext().getPackageName());
+                    Toast.makeText(getContext(), getString(stringSuccess), Toast.LENGTH_SHORT).show();
+                    mListener.onWeatherConditionFinished();
+                    closeFragment();
+                } else {
+                    int stringError = getResources().getIdentifier("global_error", "string", getContext().getPackageName());
+                    Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
+                    closeFragment();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Poi> call, Throwable t) {
                 int stringError = getResources().getIdentifier("global_error", "string", getContext().getPackageName());
                 Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
                 closeFragment();

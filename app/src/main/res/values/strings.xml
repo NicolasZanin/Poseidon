@@ -13,12 +13,18 @@
     <string name="weather_wind">Vent</string>
     <string name="weather_storm">Tornade</string>
     <string name="weather_rain">Pluie</string>
+
     <!-- Weather condition creator texts -->
     <string name="weather_condition_creator_perimeter">Périmètre : %1$d milles marin</string>
+    <string name="weather_condition_creator_real_gps_position">Position GPS Réelle</string>
+    <string name="weather_condition_creator_on_map_gps_position">Position sur la carte</string>
+    <string name="weather_condition_creator_close_button">X</string>
+    <string name="weather_condition_creator_select_gps_position">Position GPS</string>
     <string name="weather_condition_creator_button_confirm">Confirmer</string>
     <string name="weather_condition_creator_button_cancel">Annuler</string>
     <string name="weather_condition_creator_select_weather_text">Sélectionner la condition météorologique de votre emplacement actuel</string>
     <string name="weather_condition_creator_weather_sent">Condition météorologique ajoutée !</string>
+
     <!-- Weather condition updater texts -->
     <string name="weather_condition_updater_title">Indication météorologique%1$s</string>
     <string name="weather_condition_updater_coordinates">Coordonnées : %1$f, %2$f</string>
@@ -27,14 +33,32 @@
     <string name="weather_condition_updater_created_at">Créé le : %1$s</string>
     <string name="weather_condition_updater_last_update">Dernière mise à jour : %1$s</string>
     <string name="weather_condition_updater_added_by">Ajouté par : %1$s</string>
-    <string name="weather_condition_updater_finished">Terminer</string>
+    <string name="weather_condition_updater_finished">Supprimer</string>
     <string name="weather_condition_updater_close">Fermer</string>
     <string name="weather_condition_updater_succefully_deleted">Condition météorologique supprimée !</string>
-    <string name="weather_condition_updater_button_information">Si l\'indication météorologique n\'est plus d\'actualité, cliquez sur le bouton \'Terminer\' afin de la supprimer.</string>
+    <string name="weather_condition_updater_succefully_deleted_definitely">Condition météorologique supprimée définitivement de votre historique !</string>
+    <string name="weather_condition_updater_button_information">Si l\'indication météorologique n\'est plus d\'actualité, cliquez sur le bouton \'Supprimer\' afin de la supprimer.</string>
+    <string name="weather_condition_updater_button_information_already_finished">Cette indication météorologique est terminé, cliquez sur le bouton \'Supprimer\' afin de la supprimer définitivement de votre historique.</string>
+
     <!-- Picture fragment -->
     <string name="fragment_picture_take_picture">Prendre une photo</string>
     <string name="fragment_picture_retake_picture">Reprendre</string>
     <string name="fragment_picture_remove_picture">Supprimer</string>
     <string name="fragment_picture_photo_text_indicator">Appuyez sur le bouton ci-dessous pour ajouter une photo de la condition météorologique</string>
     <string name="fragment_picture_photo">Photo :</string>
+
+    <!-- Profile fragment -->
+    <string name="fragment_profile_disconnect">Déconnexion</string>
+    <string name="fragment_profile_close_button">X</string>
+    <string name="fragment_profile_name_example">Julian ZAZIN</string>
+    <string name="fragment_profile_nb_events_notifies">%1$s événement notifié</string>
+    <string name="fragment_profile_nb_events_notifies_plural">%1$s événements notifiés</string>
+    <string name="fragment_profile_history_title">Historique</string>
+    <string name="fragment_profile_history_columns_type">Type</string>
+    <string name="fragment_profile_history_columns_date">Date</string>
+    <string name="fragment_profile_history_columns_coordinates">Coordonnées</string>
+    <string name="fragment_profile_history_columns_duration">Durée</string>
+    <string name="fragment_profile_history_columns_locate">Localiser</string>
+    <string name="fragment_profile_history_aucun_events_notifies">Aucun événement notifié…</string>
+
 </resources>
