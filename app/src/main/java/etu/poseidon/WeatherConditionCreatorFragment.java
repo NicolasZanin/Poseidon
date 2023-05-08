@@ -20,6 +20,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
 import java.util.Locale;
 import java.util.Map;
 
@@ -46,6 +49,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
 
     private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
 
+    private GoogleSignInAccount account;
+
     public WeatherConditionCreatorFragment() {
         // Required empty public constructor
     }
@@ -64,6 +69,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
         if (getArguments() != null) {
             currentLocation = getArguments().getParcelable(ARG_CURRENT_LOCATION);
         }
+
+        account = GoogleSignIn.getLastSignedInAccount(getContext());
     }
 
     @Override
@@ -186,6 +193,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
         newPoi.setLongitude(currentLocation.getLongitude());
         newPoi.setWeatherCondition(getSelectedWeatherCondition());
         newPoi.setPerimeter(perimeter);
+        newPoi.setCreatorEmail(account.getEmail());
+        newPoi.setCreatorFullname(account.getDisplayName());
 
         PoiApiClient.getInstance().createPoi(newPoi, new Callback<Poi>() {
             @Override

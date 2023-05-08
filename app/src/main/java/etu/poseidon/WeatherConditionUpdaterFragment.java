@@ -98,6 +98,11 @@ public class WeatherConditionUpdaterFragment extends Fragment {
             lastUpdate.setText(getString(stringLastUpdate, poiToUpdate.getUpdatedAt()));
         }
 
+        TextView addedBy = view.findViewById(R.id.added_by);
+        int stringAddedBy = getResources().getIdentifier("weather_condition_updater_added_by", "string", getContext().getPackageName());
+        addedBy.setText(getString(stringAddedBy, poiToUpdate.getCreatorFullname()));
+
+
         TextView closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(v -> closeFragment());
 

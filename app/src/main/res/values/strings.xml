@@ -26,6 +26,7 @@
     <string name="weather_condition_updater_perimeter">Périmètre : %1$d milles marin</string>
     <string name="weather_condition_updater_created_at">Créé le : %1$s</string>
     <string name="weather_condition_updater_last_update">Dernière mise à jour : %1$s</string>
+    <string name="weather_condition_updater_added_by">Ajouté par : %1$s</string>
     <string name="weather_condition_updater_finished">Terminer</string>
     <string name="weather_condition_updater_close">Fermer</string>
     <string name="weather_condition_updater_succefully_deleted">Condition météorologique supprimée !</string>

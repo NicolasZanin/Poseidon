@@ -72,16 +72,12 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
 
     GoogleSignInAccount loggedAccount;
 
-    private final String TAG = "JULIAN " + getClass().getSimpleName();
+    private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final int DEFAULT_UPDATE_INTERVAL = 30;
     public static final int FAST_UPDATE_INTERVAL = 5;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
 
-
-    TextView tv_lat, tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address;
-    Switch sw_gps, sw_locationsupdates;
-    boolean updateOn = false;
     LocationRequest locationRequest;
     LocationCallback locationCallBack;
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -224,6 +220,8 @@ public class MainActivity extends AppCompatActivity implements WeatherConditionU
         // Button to open profile
         Button buttonProfile = findViewById(R.id.button_profile);
         buttonProfile.setOnClickListener(v -> openProfileFragment());
+
+        loadAllPOIs();
     }
 
     @Override
