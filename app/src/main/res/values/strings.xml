@@ -24,6 +24,7 @@
     <string name="weather_condition_creator_button_cancel">Annuler</string>
     <string name="weather_condition_creator_select_weather_text">Sélectionner la condition météorologique de votre emplacement actuel</string>
     <string name="weather_condition_creator_weather_sent">Condition météorologique ajoutée !</string>
+    <string name="weather_condition_creator_no_gps">Votre position GPS est nulle, veuillez la mettre à jour (ouvrez Google Maps) !</string>
 
     <!-- Weather condition updater texts -->
     <string name="weather_condition_updater_title">Indication météorologique%1$s</string>

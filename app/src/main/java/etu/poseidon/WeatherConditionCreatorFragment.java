@@ -202,6 +202,12 @@ public class WeatherConditionCreatorFragment extends Fragment {
     private void handleConfirmButton(){
         Poi newPoi = new Poi();
         if(realLocationButton.isChecked()) {
+            if(currentRealLocation == null) {
+                int stringError = getResources().getIdentifier("weather_condition_creator_no_gps", "string", getContext().getPackageName());
+                Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_LONG).show();
+                closeFragment();
+                return;
+            }
             newPoi.setLatitude(currentRealLocation.getLatitude());
             newPoi.setLongitude(currentRealLocation.getLongitude());
         } else {

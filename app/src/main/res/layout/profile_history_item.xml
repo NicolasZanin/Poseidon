@@ -4,25 +4,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/condition_meteo"
+    <ImageView
+        android:id="@+id/condition_meteo_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:background="@drawable/profile_history_layout_circle_background"
-        android:layout_margin="6dp"
+        android:src="@drawable/ic_weather_rain"
+        android:layout_margin="14dp"
+        android:padding="15dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <ImageView
-            android:id="@+id/condition_meteo_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_weather_rain"
-            android:layout_margin="14dp"/>
-
-    </LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
     <TextView
         android:id="@+id/date"
@@ -30,7 +23,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@id/condition_meteo"
+        app:layout_constraintStart_toEndOf="@id/condition_meteo_image"
         app:layout_constraintEnd_toStartOf="@id/coordinates"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -79,24 +72,17 @@
         android:text="21 heures"
         android:gravity="center"/>
 
-    <LinearLayout
+    <ImageView
         android:id="@+id/locate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:src="@drawable/ic_locate"
         android:background="@drawable/profile_history_layout_circle_background"
-        android:layout_margin="6dp"
+        android:padding="15dp"
+        android:layout_margin="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        >
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_locate"
-            android:layout_margin="14dp"/>
-
-    </LinearLayout>
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

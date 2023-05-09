@@ -104,6 +104,10 @@ public class ProfileFragment extends Fragment {
             public void onResponse(Call<List<Poi>> call, Response<List<Poi>> response) {
                 if (response.isSuccessful()) {
                     List<Poi> poiList = response.body();
+                    // The player can have leave the fragment before we get the response, so we need to check if the context is still available and if not return
+                    if (getContext() == null) {
+                        return;
+                    }
                     ProfileHistoryAdapter adapter = new ProfileHistoryAdapter(getContext(), poiList);
                     container.setAdapter(adapter);
 

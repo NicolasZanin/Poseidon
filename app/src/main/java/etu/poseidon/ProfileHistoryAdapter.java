@@ -8,12 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,7 +44,7 @@ public class ProfileHistoryAdapter extends BaseAdapter {
     public View getView (int position, View convertView, ViewGroup parent){
         Poi item = items.get(position);
         // (1) : Réutilisation des layouts
-        View layoutItem = convertView == null ? mInflater.inflate (R.layout.profile_history_layout, parent, false) : convertView;
+        View layoutItem = convertView == null ? mInflater.inflate (R.layout.profile_history_item, parent, false) : convertView;
         // (2) : Récupération des TextView de notre layout
         TextView longitudeTextView = layoutItem.findViewById(R.id.longitude);
         TextView latitudeTextView = layoutItem.findViewById(R.id.latitude);
