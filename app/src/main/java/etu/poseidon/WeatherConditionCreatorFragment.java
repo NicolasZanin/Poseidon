@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.Locale;
 import java.util.Map;
 
@@ -45,7 +47,7 @@ public class WeatherConditionCreatorFragment extends Fragment {
     private static final String ARG_REAL_LOCATION = "real_location_param";
     private static final String ARG_MAP_LOCATION = "map_location_param";
     private Location currentRealLocation;
-    private Location currentMapLocation;
+    private GeoPoint currentMapLocation;
     private final int BUTTONS_PER_ROW = 3;
     private final float BUTTONS_DP_SIZE = 90f;
 

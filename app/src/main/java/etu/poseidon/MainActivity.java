@@ -329,9 +329,7 @@ public class MainActivity extends AppCompatActivity implements
             weatherConditionCreatorFragment.setArguments(args);
 
             // Map location
-            Location location = new Location(currentRealLocation);
-            location.setLatitude(map.getMapCenter().getLatitude());
-            location.setLongitude(map.getMapCenter().getLongitude());
+            GeoPoint location = new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
             args.putParcelable("map_location_param", location);
             weatherConditionCreatorFragment.setArguments(args);
 
