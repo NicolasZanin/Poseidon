@@ -51,6 +51,7 @@ public class ProfileHistoryAdapter extends BaseAdapter {
         TextView latitudeTextView = layoutItem.findViewById(R.id.latitude);
         TextView durationTextView = layoutItem.findViewById(R.id.duration);
         TextView dateTextView = layoutItem.findViewById(R.id.date);
+        TextView stateTextView = layoutItem.findViewById(R.id.state);
         ImageView conditionMeteoImageView = layoutItem.findViewById(R.id.condition_meteo_image);
 
         // (3) : Renseignement des valeurs
@@ -82,6 +83,14 @@ public class ProfileHistoryAdapter extends BaseAdapter {
             dateTextView.setText(outputFormat.format(dateCreated));
         } catch (ParseException e) {
             dateTextView.setText(item.getCreatedAt());
+        }
+
+        if (!item.isFinished()){
+            stateTextView.setText(R.string.profile_history_item_ongoing);
+            stateTextView.setTextColor(layoutItem.getResources().getColor(R.color.green));
+        } else {
+            stateTextView.setText(R.string.profile_history_item_finished);
+            stateTextView.setTextColor(layoutItem.getResources().getColor(R.color.grey));
         }
 
         // Weather condition image
