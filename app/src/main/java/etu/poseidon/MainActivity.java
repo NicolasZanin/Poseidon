@@ -43,6 +43,7 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.Locale;
 
 import etu.poseidon.models.Poi;
+import etu.poseidon.temp.TempAlertExample;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -220,6 +221,12 @@ public class MainActivity extends AppCompatActivity implements
         buttonProfile.setOnClickListener(v -> openProfileFragment());
 
         loadAllPOIs();
+
+        // This is temporary - only for demonstration
+        // Trst Arnaud
+        Button testArnaud = findViewById(R.id.test_arnaud);
+        testArnaud.setOnClickListener(v -> TempAlertExample.run());
+        // End temporary code
     }
 
     @Override

@@ -1,4 +1,4 @@
-package etu.poseidon.webservices.pois;
+package etu.poseidon.webservices.alerts;
 
 import android.util.Log;
 
@@ -7,7 +7,7 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.util.List;
 
-import etu.poseidon.models.Poi;
+import etu.poseidon.models.Alert;
 import etu.poseidon.models.weather.WeatherCondition;
 import etu.poseidon.models.weather.WeatherConditionAdapter;
 import okhttp3.Interceptor;
@@ -20,13 +20,13 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PoiApiClient {
+public class AlertApiClient {
 
     private static final String BASE_URL = "http://api.poseidon.alexismalosse.fr/";
-    private static PoiApiClient instance;
-    private PoiApiService poiApiService;
+    private static AlertApiClient instance;
+    private AlertApiService alertApiService;
 
-    private PoiApiClient() {
+    private AlertApiClient() {
         // Temporaire pour afficher le JSON brut dans le logcat
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.addInterceptor(new Interceptor() {
@@ -35,7 +35,7 @@ public class PoiApiClient {
                 Request request = chain.request();
                 Response response = chain.proceed(request);
                 String rawJson = response.body().string();
-                Log.d("Raw JSON POI", rawJson); // afficher le JSON brut dans le logcat
+                //Log.d("Raw JSON Alert", rawJson); // afficher le JSON brut dans le logcat
                 return response.newBuilder()
                         .body(ResponseBody.create(response.body().contentType(), rawJson))
                         .build();
@@ -51,38 +51,33 @@ public class PoiApiClient {
                         .registerTypeAdapter(WeatherCondition.class, new WeatherConditionAdapter())
                         .create()))
                 .build();
-        poiApiService = retrofit.create(PoiApiService.class);
+        alertApiService = retrofit.create(AlertApiService.class);
     }
 
-    public static synchronized PoiApiClient getInstance() {
+    public static synchronized AlertApiClient getInstance() {
         if (instance == null) {
-            instance = new PoiApiClient();
+            instance = new AlertApiClient();
         }
         return instance;
     }
 
-    public void getPoiList(Callback<List<Poi>> callback) {
-        Call<List<Poi>> call = poiApiService.getPoiList();
+    public void getAlertsForUser(String email, Callback<List<Alert>> callback) {
+        Call<List<Alert>> call = alertApiService.getAlertsForUser(email);
         call.enqueue(callback);
     }
 
-    public void getHistoryForUser(String email, Callback<List<Poi>> callback) {
-        Call<List<Poi>> call = poiApiService.getHistoryForUser(email);
+    public void createAlert(Alert alert, Callback<Alert> callback) {
+        Call<Alert> call = alertApiService.createAlert(alert);
         call.enqueue(callback);
     }
 
-    public void createPoi(Poi poi, Callback<Poi> callback) {
-        Call<Poi> call = poiApiService.createPoi(poi);
+    public void updateAlert(String alertId, Alert alert, Callback<Alert> callback) {
+        Call<Alert> call = alertApiService.updateAlert(alertId, alert);
         call.enqueue(callback);
     }
 
-    public void updatePoi(String poiId, Poi poi, Callback<Poi> callback) {
-        Call<Poi> call = poiApiService.updatePoi(poiId, poi);
-        call.enqueue(callback);
-    }
-
-    public void deletePoi(String poiId, Callback<Void> callback) {
-        Call<Void> call = poiApiService.deletePoi(poiId);
+    public void deleteAlert(String alertId, Callback<Void> callback) {
+        Call<Void> call = alertApiService.deleteAlert(alertId);
         call.enqueue(callback);
     }
 }

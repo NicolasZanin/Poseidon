@@ -32,6 +32,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         />
 
+    <!-- THIS IS TEMPORARY - ONLY FOR DEMONSTRATION -->
+    <!-- A SUPP ARNAUD -->
+    <Button
+        android:id="@+id/test_arnaud"
+        android:text="Test Arnaud"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+    <!-- END OF TEMPORARY -->
+
     <org.osmdroid.views.MapView
         android:id="@+id/carte"
         android:layout_width="match_parent"
