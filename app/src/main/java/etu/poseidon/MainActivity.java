@@ -8,7 +8,9 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,10 +21,12 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.List;
 
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
@@ -103,11 +107,9 @@ public class MainActivity extends AppCompatActivity implements
 
         // Pour mettre le niveau de zoom à 20.0
         gestionnaireMap.setZoom(20.0);
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(1000 * DEFAULT_UPDATE_INTERVAL);
-        locationRequest.setFastestInterval(1000 * FAST_UPDATE_INTERVAL);
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+                .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setMinUpdateIntervalMillis(1000 * FAST_UPDATE_INTERVAL).build();
         /*startLocationUpdates();*/
         locationCallBack = new LocationCallback() {
             @Override
@@ -117,6 +119,12 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
         updateGPS();
+
+        findViewById(R.id.button_relocate).setOnClickListener( click -> {
+            GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
+                    currentRealLocation.getLongitude());
+            gestionnaireMap.setCenter(geoPointActuel);
+        });
     }
 
     private void stopLocationUpdates() {
@@ -286,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Set resource icon dynamically with poi.getType()
         int poiIconId = getResources().getIdentifier("ic_poi_" + poi.getWeatherCondition().name().toLowerCase(Locale.ROOT), "drawable", getPackageName());
-        Drawable poiIcon = getResources().getDrawable(poiIconId);
+        Drawable poiIcon = ResourcesCompat.getDrawable(getResources(), poiIconId, getTheme());
         poiMarker.setIcon(poiIcon);
 
         // On récupère la liste des points de la map et on ajoute le point sur cette liste pour
