@@ -33,12 +33,13 @@
 
     <Button
         android:id="@+id/button_relocate"
-        android:background="@drawable/round_button"
-        android:textSize="0sp"
-        android:drawableTop="@drawable/images_localisation"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_margin="10dp"
+        android:background="@drawable/round_button"
+        android:drawableTop="@drawable/images_localisation"
+        android:drawableTint="@color/white"
+        android:textSize="0sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
