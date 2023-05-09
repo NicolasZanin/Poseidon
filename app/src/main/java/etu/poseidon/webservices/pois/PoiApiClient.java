@@ -66,6 +66,11 @@ public class PoiApiClient {
         call.enqueue(callback);
     }
 
+    public void getHistoryForUser(String email, Callback<List<Poi>> callback) {
+        Call<List<Poi>> call = poiApiService.getHistoryForUser(email);
+        call.enqueue(callback);
+    }
+
     public void createPoi(Poi poi, Callback<Poi> callback) {
         Call<Poi> call = poiApiService.createPoi(poi);
         call.enqueue(callback);
