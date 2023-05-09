@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments.profile;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -25,6 +25,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
+import etu.poseidon.R;
 import etu.poseidon.models.Poi;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
@@ -37,6 +39,10 @@ public class ProfileFragment extends Fragment {
     private TextView numberOfEventsTextView, noEventsTextView;
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount loggedInAccount;
+
+    public ProfileFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

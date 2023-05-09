@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import etu.poseidon.R;
 import etu.poseidon.models.Poi;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;

@@ -42,6 +42,13 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.Locale;
 
+import etu.poseidon.fragments.LoginFragment;
+import etu.poseidon.fragments.profile.ProfileFragment;
+import etu.poseidon.fragments.WeatherConditionCreatorFragment;
+import etu.poseidon.fragments.WeatherConditionUpdaterFragment;
+import etu.poseidon.fragments.picture.IPictureActivity;
+import etu.poseidon.fragments.picture.PictureFragment;
+import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
 import etu.poseidon.models.Poi;
 import etu.poseidon.temp.TempAlertExample;
 import etu.poseidon.webservices.pois.PoiApiClient;
@@ -53,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements
         WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnLocateButtonClickedListener,
-        IPuctureActivity {
+        IPictureActivity {
     private MapView map;
     private IMapController gestionnaireMap;
 

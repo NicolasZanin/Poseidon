@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments.profile;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import etu.poseidon.R;
 import etu.poseidon.models.Poi;
 
 public class ProfileHistoryAdapter extends BaseAdapter {
