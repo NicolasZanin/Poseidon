@@ -117,6 +117,11 @@ public class WeatherConditionUpdaterFragment extends Fragment {
             finished.setBackgroundColor(getResources().getColor(R.color.red));
         }
 
+        // Hide edition_layout if the poi is finished
+        if(poiToUpdate.isFinished()){
+            view.findViewById(R.id.edition_layout).setVisibility(View.GONE);
+        }
+
         return view;
     }
 
