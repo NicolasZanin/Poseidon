@@ -61,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements
         WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnLocateButtonClickedListener,
-        IPictureActivity {
+        SearchFragment.OnSearchFragmentListener,
+        IPuctureActivity {
     private MapView map;
     private IMapController gestionnaireMap;
 
@@ -131,7 +132,11 @@ public class MainActivity extends AppCompatActivity implements
                     currentRealLocation.getLongitude());
             gestionnaireMap.setCenter(geoPointActuel);
         });
-
+      
+        findViewById(R.id.button_search).setOnClickListener( click -> {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_Search, new SearchFragment()).commit();
+        });
+      
         findViewById(R.id.coMap).setOnClickListener( click -> {
             Button button = findViewById(R.id.coMap);
             if(followUser){
@@ -146,8 +151,6 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         updateGPS();
-
-
     }
 
     private void stopLocationUpdates() {
@@ -416,5 +419,11 @@ public class MainActivity extends AppCompatActivity implements
         gestionnaireMap.setCenter(poiPosition);
         gestionnaireMap.setZoom(20.0);
         openWeatherConditionUpdaterFragment(poi);
+    }
+
+    // Centre la map avec le GeoPoint donner dans la barre de recherche
+    @Override
+    public void relocateSearch(GeoPoint geoPoint) {
+        gestionnaireMap.setCenter(geoPoint);
     }
 }
