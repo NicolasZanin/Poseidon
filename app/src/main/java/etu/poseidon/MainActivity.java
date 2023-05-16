@@ -36,6 +36,7 @@ import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -46,7 +47,15 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.Locale;
 
+import etu.poseidon.fragments.LoginFragment;
+import etu.poseidon.fragments.profile.ProfileFragment;
+import etu.poseidon.fragments.WeatherConditionCreatorFragment;
+import etu.poseidon.fragments.WeatherConditionUpdaterFragment;
+import etu.poseidon.fragments.picture.IPictureActivity;
+import etu.poseidon.fragments.picture.PictureFragment;
+import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
 import etu.poseidon.models.Poi;
+import etu.poseidon.temp.TempAlertExample;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -65,9 +74,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final int DEFAULT_UPDATE_INTERVAL = 30;
-    public static final int FAST_UPDATE_INTERVAL = 5;
+    public static final int FAST_UPDATE_INTERVAL = 1;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
+    public boolean followUser = false;
     private Bitmap picture;
 
     LocationRequest locationRequest;
@@ -108,10 +118,11 @@ public class MainActivity extends AppCompatActivity implements
 
         // Pour mettre le niveau de zoom à 20.0
         gestionnaireMap.setZoom(20.0);
-        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-                .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
-                .setMinUpdateIntervalMillis(1000 * FAST_UPDATE_INTERVAL).build();
-        /*startLocationUpdates();*/
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(1000 * FAST_UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(1000 * FAST_UPDATE_INTERVAL);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationCallBack = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -119,18 +130,31 @@ public class MainActivity extends AppCompatActivity implements
                 updateCurrentLocation(locationResult.getLastLocation());
             }
         };
-        updateGPS();
 
         findViewById(R.id.button_relocate).setOnClickListener( click -> {
             GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
                     currentRealLocation.getLongitude());
             gestionnaireMap.setCenter(geoPointActuel);
         });
-
+      
         findViewById(R.id.button_search).setOnClickListener( click -> {
-            Log.d("TEST", "5");
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_Search, new SearchFragment()).commit();
         });
+      
+        findViewById(R.id.coMap).setOnClickListener( click -> {
+            Button button = findViewById(R.id.coMap);
+            if(followUser){
+                stopLocationUpdates();
+                followUser = false;
+                button.setText("Exploration de la carte");
+            }else{
+                startLocationUpdates();
+                followUser = true;
+                button.setText("La carte suit votre position");
+            }
+        });
+
+        updateGPS();
     }
 
     private void stopLocationUpdates() {
@@ -138,17 +162,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null);
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallBack,null);
         updateGPS();
     }
 
@@ -163,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(TAG, "grantResults : " +grantResults[0]);
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "grantResults[0] = "+ PackageManager.PERMISSION_GRANTED);
-                    updateGPS();
+                    startLocationUpdates();
                     Log.d(TAG, "GPS UPDATED");
 
                 } else {
@@ -211,6 +225,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void updateCurrentLocation(Location location) {
         currentRealLocation = location;
+        Button button = findViewById(R.id.coordinates);
+        button.setText(currentRealLocation.getLatitude() + " " + currentRealLocation.getLongitude());
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
         gestionnaireMap.setCenter(newLocation);
         gestionnaireMap.setZoom(20.0);
@@ -234,6 +250,15 @@ public class MainActivity extends AppCompatActivity implements
         buttonProfile.setOnClickListener(v -> openProfileFragment());
 
         loadAllPOIs();
+
+        // This is temporary - only for demonstration
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
+            // Trst Arnaud
+            Button testArnaud = findViewById(R.id.test_arnaud);
+            testArnaud.setOnClickListener(v -> TempAlertExample.run());
+            // End temporary code
+        }
     }
 
     @Override

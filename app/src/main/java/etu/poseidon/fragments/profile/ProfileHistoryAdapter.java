@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments.profile;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,12 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import etu.poseidon.R;
 import etu.poseidon.models.Poi;
 
 public class ProfileHistoryAdapter extends BaseAdapter {
@@ -50,12 +45,13 @@ public class ProfileHistoryAdapter extends BaseAdapter {
     public View getView (int position, View convertView, ViewGroup parent){
         Poi item = items.get(position);
         // (1) : Réutilisation des layouts
-        View layoutItem = convertView == null ? mInflater.inflate (R.layout.profile_history_layout, parent, false) : convertView;
+        View layoutItem = convertView == null ? mInflater.inflate (R.layout.profile_history_item, parent, false) : convertView;
         // (2) : Récupération des TextView de notre layout
         TextView longitudeTextView = layoutItem.findViewById(R.id.longitude);
         TextView latitudeTextView = layoutItem.findViewById(R.id.latitude);
         TextView durationTextView = layoutItem.findViewById(R.id.duration);
         TextView dateTextView = layoutItem.findViewById(R.id.date);
+        TextView stateTextView = layoutItem.findViewById(R.id.state);
         ImageView conditionMeteoImageView = layoutItem.findViewById(R.id.condition_meteo_image);
 
         // (3) : Renseignement des valeurs
@@ -87,6 +83,14 @@ public class ProfileHistoryAdapter extends BaseAdapter {
             dateTextView.setText(outputFormat.format(dateCreated));
         } catch (ParseException e) {
             dateTextView.setText(item.getCreatedAt());
+        }
+
+        if (!item.isFinished()){
+            stateTextView.setText(R.string.profile_history_item_ongoing);
+            stateTextView.setTextColor(layoutItem.getResources().getColor(R.color.green));
+        } else {
+            stateTextView.setText(R.string.profile_history_item_finished);
+            stateTextView.setTextColor(layoutItem.getResources().getColor(R.color.grey));
         }
 
         // Weather condition image

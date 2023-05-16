@@ -12,7 +12,7 @@
     android:layout_gravity="center"
     android:padding="10dp"
     android:background="@drawable/popup"
-    tools:context=".WeatherConditionUpdaterFragment"
+    tools:context=".fragments.WeatherConditionUpdaterFragment"
     >
 
     <TextView
@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:text="@string/weather_condition_updater_title"
         android:textSize="18sp"
+        android:textStyle="bold"
         android:textColor="@color/black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -95,15 +96,87 @@
         android:layout_marginStart="10dp"
         />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/edition_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/added_by"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="10dp">
+
+        <View
+            android:id="@+id/edition_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/edition_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Modification"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/edition_divider"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/edition_soon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bientôt..."
+            android:layout_marginTop="5dp"
+            android:textSize="14sp"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/edition_title"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <View
+        android:id="@+id/deletion_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@id/edition_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/deletion_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Suppression"
+        android:layout_marginStart="10dp"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/deletion_divider"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+
     <TextView
         android:id="@+id/click_if_is_finished"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/weather_condition_updater_button_information"
         android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/added_by"
+        app:layout_constraintTop_toBottomOf="@id/deletion_title"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         />

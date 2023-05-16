@@ -38,55 +38,8 @@
         android:drawableTop="@drawable/images_localisation"
         android:drawableTint="@color/white"
         android:textSize="0sp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- THIS IS TEMPORARY - ONLY FOR DEMONSTRATION -->
-    <!-- A SUPP ARNAUD -->
-    <Button
-        android:id="@+id/test_arnaud"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Test Arnaud"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <!-- END OF TEMPORARY -->
-
-    <Button
-        android:id="@+id/coordinates"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="COORDONNEES"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/coMap"
-        />
-
-    <Button
-        android:id="@+id/coMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="FOLLOW"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/test_arnaud"
-        />
-
-    <Button
-        android:id="@+id/button_search"
-        android:background="@drawable/round_button"
-        android:textSize="0sp"
-        android:drawableTop="@drawable/ic_search"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_margin="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         />
 
     <org.osmdroid.views.MapView
@@ -98,16 +51,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         />
-
-    <FrameLayout
-        android:id="@+id/fragment_Search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/grey"
-        android:elevation="10dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 
     <FrameLayout
         android:id="@+id/fragment"
