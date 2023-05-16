@@ -8,9 +8,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,7 +19,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.List;
@@ -36,7 +33,6 @@ import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
-import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -49,8 +45,8 @@ import java.util.Locale;
 
 import etu.poseidon.fragments.LoginFragment;
 import etu.poseidon.fragments.profile.ProfileFragment;
-import etu.poseidon.fragments.WeatherConditionCreatorFragment;
-import etu.poseidon.fragments.WeatherConditionUpdaterFragment;
+import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
+import etu.poseidon.fragments.weathercondition.WeatherConditionUpdaterFragment;
 import etu.poseidon.fragments.picture.IPictureActivity;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
@@ -66,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnLocateButtonClickedListener,
         SearchFragment.OnSearchFragmentListener,
-        IPuctureActivity {
+        IPictureActivity {
     private MapView map;
     private IMapController gestionnaireMap;
 

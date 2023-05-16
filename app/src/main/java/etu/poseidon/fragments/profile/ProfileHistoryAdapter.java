@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -102,6 +104,10 @@ public class ProfileHistoryAdapter extends BaseAdapter {
             ProfileHistoryAdapter.OnLocateButtonClickedListener activity = (OnLocateButtonClickedListener) v.getContext();
             activity.onLocateButtonClicked(item);
         });
+
+        Animation animation = AnimationUtils.loadAnimation(mInflater.getContext(), R.anim.slide_in_left);
+        animation.setDuration(300);
+        layoutItem.startAnimation(animation);
 
         return layoutItem;
     }

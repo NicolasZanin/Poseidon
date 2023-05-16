@@ -11,7 +11,7 @@
     android:layout_marginBottom="10dp"
     android:layout_gravity="center"
     android:background="@drawable/popup"
-    tools:context=".fragments.WeatherConditionCreatorFragment">
+    tools:context=".fragments.weathercondition.WeatherConditionCreatorFragment">
 
     <!-- Bouton de déconnexion -->
     <Button
