@@ -36,6 +36,7 @@ import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -72,9 +73,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final int DEFAULT_UPDATE_INTERVAL = 30;
-    public static final int FAST_UPDATE_INTERVAL = 5;
+    public static final int FAST_UPDATE_INTERVAL = 1;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
+    public boolean followUser = false;
     private Bitmap picture;
 
     LocationRequest locationRequest;
@@ -127,14 +129,27 @@ public class MainActivity extends AppCompatActivity implements
                 updateCurrentLocation(locationResult.getLastLocation());
             }
         };
-        updateGPS();
 
         findViewById(R.id.button_relocate).setOnClickListener( click -> {
-            startLocationUpdates();
             GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
                     currentRealLocation.getLongitude());
             gestionnaireMap.setCenter(geoPointActuel);
         });
+
+        findViewById(R.id.coMap).setOnClickListener( click -> {
+            Button button = findViewById(R.id.coMap);
+            if(followUser){
+                stopLocationUpdates();
+                followUser = false;
+                button.setText("Exploration de la carte");
+            }else{
+                startLocationUpdates();
+                followUser = true;
+                button.setText("La carte suit votre position");
+            }
+        });
+
+        updateGPS();
 
 
     }
@@ -207,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void updateCurrentLocation(Location location) {
         currentRealLocation = location;
+        Button button = findViewById(R.id.coordinates);
+        button.setText(currentRealLocation.getLatitude() + " " + currentRealLocation.getLongitude());
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
         gestionnaireMap.setCenter(newLocation);
         gestionnaireMap.setZoom(20.0);
