@@ -1,4 +1,4 @@
-package etu.poseidon.fragments;
+package etu.poseidon.fragments.weathercondition;
 
 import android.content.Context;
 import android.location.Location;
@@ -26,8 +26,8 @@ import org.osmdroid.util.GeoPoint;
 import java.util.List;
 
 import etu.poseidon.R;
-import etu.poseidon.WeatherConditionListSelectorFragment;
 import etu.poseidon.fragments.picture.PictureFragment;
+import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
 import etu.poseidon.webservices.pois.PoiApiClient;

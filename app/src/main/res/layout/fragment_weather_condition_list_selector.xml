@@ -5,6 +5,6 @@
     android:layout_height="match_parent"
     android:id="@+id/conditions"
     android:orientation="vertical"
-    tools:context=".WeatherConditionListSelectorFragment">
+    tools:context=".fragments.weathercondition.components.WeatherConditionListSelectorFragment">
 
 </LinearLayout>

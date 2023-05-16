@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments.weathercondition.components;
 
 import android.os.Bundle;
 
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import etu.poseidon.R;
 import etu.poseidon.models.weather.WeatherCondition;
 
 public class WeatherConditionListSelectorFragment extends Fragment {

@@ -1,4 +1,4 @@
-package etu.poseidon.fragments;
+package etu.poseidon.fragments.weathercondition;
 
 import android.content.Context;
 import android.os.Bundle;
