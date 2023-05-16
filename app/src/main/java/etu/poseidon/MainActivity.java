@@ -238,10 +238,13 @@ public class MainActivity extends AppCompatActivity implements
         loadAllPOIs();
 
         // This is temporary - only for demonstration
-        // Trst Arnaud
-        Button testArnaud = findViewById(R.id.test_arnaud);
-        testArnaud.setOnClickListener(v -> TempAlertExample.run());
-        // End temporary code
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
+            // Trst Arnaud
+            Button testArnaud = findViewById(R.id.test_arnaud);
+            testArnaud.setOnClickListener(v -> TempAlertExample.run());
+            // End temporary code
+        }
     }
 
     @Override
