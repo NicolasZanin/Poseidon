@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +22,8 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Objects;
+
+import etu.poseidon.R;
 
 public class LoginFragment extends Fragment {
 

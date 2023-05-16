@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments.picture;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,7 +16,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import java.util.Date;
+import etu.poseidon.R;
 
 public class PictureFragment extends Fragment{
     private ImageView imageView;
@@ -26,7 +26,9 @@ public class PictureFragment extends Fragment{
     private Button buttonRetakeImage;
     private Button buttonRemoveImage;
 
-    public PictureFragment() {}
+    public PictureFragment() {
+        // Required empty public constructor
+    }
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_picture, container, false);
@@ -48,10 +50,10 @@ public class PictureFragment extends Fragment{
         if (ContextCompat.checkSelfPermission( getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions( getActivity(),
                     new String[] {Manifest.permission.CAMERA},
-                    IPuctureActivity.REQUEST_CAMERA);
+                    IPictureActivity.REQUEST_CAMERA);
         } else { //permission still GRANTED
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            getActivity().startActivityForResult(intent, IPuctureActivity.REQUEST_CAMERA);
+            getActivity().startActivityForResult(intent, IPictureActivity.REQUEST_CAMERA);
         }
     }
 

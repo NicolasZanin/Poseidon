@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments;
 
 import android.content.Context;
 import android.location.Location;
@@ -31,6 +31,8 @@ import org.osmdroid.util.GeoPoint;
 import java.util.Locale;
 import java.util.Map;
 
+import etu.poseidon.R;
+import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
 import etu.poseidon.webservices.pois.PoiApiClient;
@@ -202,6 +204,12 @@ public class WeatherConditionCreatorFragment extends Fragment {
     private void handleConfirmButton(){
         Poi newPoi = new Poi();
         if(realLocationButton.isChecked()) {
+            if(currentRealLocation == null) {
+                int stringError = getResources().getIdentifier("weather_condition_creator_no_gps", "string", getContext().getPackageName());
+                Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_LONG).show();
+                closeFragment();
+                return;
+            }
             newPoi.setLatitude(currentRealLocation.getLatitude());
             newPoi.setLongitude(currentRealLocation.getLongitude());
         } else {

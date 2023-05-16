@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import etu.poseidon.R;
 import etu.poseidon.models.Poi;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
@@ -114,6 +115,11 @@ public class WeatherConditionUpdaterFragment extends Fragment {
 
             // Set "delete" button to red background
             finished.setBackgroundColor(getResources().getColor(R.color.red));
+        }
+
+        // Hide edition_layout if the poi is finished
+        if(poiToUpdate.isFinished()){
+            view.findViewById(R.id.edition_layout).setVisibility(View.GONE);
         }
 
         return view;

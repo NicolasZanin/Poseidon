@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments.profile;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -25,6 +25,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
+import etu.poseidon.R;
 import etu.poseidon.models.Poi;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
@@ -37,6 +39,10 @@ public class ProfileFragment extends Fragment {
     private TextView numberOfEventsTextView, noEventsTextView;
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount loggedInAccount;
+
+    public ProfileFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,6 +110,10 @@ public class ProfileFragment extends Fragment {
             public void onResponse(Call<List<Poi>> call, Response<List<Poi>> response) {
                 if (response.isSuccessful()) {
                     List<Poi> poiList = response.body();
+                    // The player can have leave the fragment before we get the response, so we need to check if the context is still available and if not return
+                    if (getContext() == null) {
+                        return;
+                    }
                     ProfileHistoryAdapter adapter = new ProfileHistoryAdapter(getContext(), poiList);
                     container.setAdapter(adapter);
 
