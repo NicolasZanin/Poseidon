@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnLocateButtonClickedListener,
         SearchFragment.OnSearchFragmentListener,
-        IPuctureActivity {
+        IPictureActivity {
     private MapView map;
     private IMapController gestionnaireMap;
 
