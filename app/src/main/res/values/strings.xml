@@ -68,5 +68,7 @@
     <string name="profile_history_item_ongoing">En cours...</string>
     <string name="profile_history_item_sample_coordinate">5.432453</string>
     <string name="profile_history_item_sample_duration">21 heures</string>
+    <string name="connection_google">Connectez-vous avec Google !</string>
+    <string name="bouton_quitter">X</string>
 
 </resources>
