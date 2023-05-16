@@ -118,7 +118,7 @@
             android:id="@+id/edition_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Modification"
+            android:text="@string/weather_condition_updater_edition_title"
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginStart="10dp"
@@ -128,16 +128,25 @@
             />
 
         <TextView
-            android:id="@+id/edition_soon"
+            android:id="@+id/edition_range_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bientôt..."
-            android:layout_marginTop="5dp"
-            android:textSize="14sp"
-            android:layout_marginStart="10dp"
+            android:text="@string/weather_condition_updater_edition_perimeter"
+            android:textSize="16sp"
             android:textColor="@color/black"
             app:layout_constraintTop_toBottomOf="@id/edition_title"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="10dp"
+            />
+
+        <SeekBar
+            android:id="@+id/edition_range"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edition_range_value"
             />
 
 
