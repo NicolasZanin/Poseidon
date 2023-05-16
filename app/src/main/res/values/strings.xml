@@ -60,5 +60,6 @@
     <string name="fragment_profile_history_columns_duration">Durée</string>
     <string name="fragment_profile_history_columns_locate">Localiser</string>
     <string name="fragment_profile_history_aucun_events_notifies">Aucun événement notifié…</string>
+    <string name="edit_text_recherche">Rechercher...</string>
 
 </resources>
