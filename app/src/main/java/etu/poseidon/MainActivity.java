@@ -47,6 +47,7 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.Locale;
 
 import etu.poseidon.fragments.LoginFragment;
+import etu.poseidon.fragments.alert.AlertsMenu;
 import etu.poseidon.fragments.profile.ProfileFragment;
 import etu.poseidon.fragments.WeatherConditionCreatorFragment;
 import etu.poseidon.fragments.WeatherConditionUpdaterFragment;
@@ -235,6 +236,9 @@ public class MainActivity extends AppCompatActivity implements
         Button buttonProfile = findViewById(R.id.button_profile);
         buttonProfile.setOnClickListener(v -> openProfileFragment());
 
+        Button buttonAlert = findViewById(R.id.button_alert_menu);
+        buttonAlert.setOnClickListener(v -> openAlertFragment());
+
         loadAllPOIs();
 
         // This is temporary - only for demonstration
@@ -368,6 +372,17 @@ public class MainActivity extends AppCompatActivity implements
             ProfileFragment profileFragment = new ProfileFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) profileFragment).commit();
             openedFragment = profileFragment;
+        } else {
+            openLoginFragment();
+        }
+    }
+
+    private void openAlertFragment(){
+        if(GoogleSignIn.getLastSignedInAccount(this) != null){
+            closeOpenedFragment();
+            AlertsMenu alertFragment = new AlertsMenu();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) alertFragment).commit();
+            openedFragment = alertFragment;
         } else {
             openLoginFragment();
         }
