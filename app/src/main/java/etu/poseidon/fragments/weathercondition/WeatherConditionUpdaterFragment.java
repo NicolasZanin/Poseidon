@@ -1,4 +1,4 @@
-package etu.poseidon.fragments;
+package etu.poseidon.fragments.weathercondition;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -107,6 +108,7 @@ public class WeatherConditionUpdaterFragment extends Fragment {
         Button finished = view.findViewById(R.id.finished);
         finished.setOnClickListener(v -> deletePoi());
 
+        // Delete part
         TextView informationText = view.findViewById(R.id.click_if_is_finished);
         if(poiToUpdate.isFinished()){
             // Change information text
@@ -117,9 +119,32 @@ public class WeatherConditionUpdaterFragment extends Fragment {
             finished.setBackgroundColor(getResources().getColor(R.color.red));
         }
 
-        // Hide edition_layout if the poi is finished
+        // Edition part
         if(poiToUpdate.isFinished()){
+            // Hide edition_layout if the poi is finished
             view.findViewById(R.id.edition_layout).setVisibility(View.GONE);
+        } else {
+            // Default value for range text
+            int stringRange = getResources().getIdentifier("weather_condition_updater_edition_perimeter", "string", getContext().getPackageName());
+            TextView rangeValue = view.findViewById(R.id.edition_range_value);
+            rangeValue.setText(getString(stringRange, (int) poiToUpdate.getPerimeter()));
+
+            SeekBar range = view.findViewById(R.id.edition_range);
+            range.setProgress((int) poiToUpdate.getPerimeter());
+            range.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    rangeValue.setText(getString(stringRange, progress));
+                    poiToUpdate.setPerimeter(progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
         }
 
         return view;

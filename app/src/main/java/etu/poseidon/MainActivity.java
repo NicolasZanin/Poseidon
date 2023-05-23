@@ -8,9 +8,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,7 +19,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.List;
@@ -49,8 +46,8 @@ import java.util.Locale;
 import etu.poseidon.fragments.LoginFragment;
 import etu.poseidon.fragments.alert.AlertsMenu;
 import etu.poseidon.fragments.profile.ProfileFragment;
-import etu.poseidon.fragments.WeatherConditionCreatorFragment;
-import etu.poseidon.fragments.WeatherConditionUpdaterFragment;
+import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
+import etu.poseidon.fragments.weathercondition.WeatherConditionUpdaterFragment;
 import etu.poseidon.fragments.picture.IPictureActivity;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
@@ -65,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements
         WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnLocateButtonClickedListener,
+        SearchFragment.OnSearchFragmentListener,
         IPictureActivity {
     private MapView map;
     private IMapController gestionnaireMap;
@@ -73,9 +71,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final int DEFAULT_UPDATE_INTERVAL = 30;
-    public static final int FAST_UPDATE_INTERVAL = 5;
+    public static final int FAST_UPDATE_INTERVAL = 1;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
+    public boolean followUser = false;
     private Bitmap picture;
 
     LocationRequest locationRequest;
@@ -116,10 +115,11 @@ public class MainActivity extends AppCompatActivity implements
 
         // Pour mettre le niveau de zoom à 20.0
         gestionnaireMap.setZoom(20.0);
-        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-                .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
-                .setMinUpdateIntervalMillis(1000 * FAST_UPDATE_INTERVAL).build();
-        /*startLocationUpdates();*/
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(1000 * FAST_UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(1000 * FAST_UPDATE_INTERVAL);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationCallBack = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -127,13 +127,31 @@ public class MainActivity extends AppCompatActivity implements
                 updateCurrentLocation(locationResult.getLastLocation());
             }
         };
-        updateGPS();
 
         findViewById(R.id.button_relocate).setOnClickListener( click -> {
             GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
                     currentRealLocation.getLongitude());
             gestionnaireMap.setCenter(geoPointActuel);
         });
+      
+        findViewById(R.id.button_search).setOnClickListener( click -> {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_Search, new SearchFragment()).commit();
+        });
+      
+        findViewById(R.id.coMap).setOnClickListener( click -> {
+            Button button = findViewById(R.id.coMap);
+            if(followUser){
+                stopLocationUpdates();
+                followUser = false;
+                button.setText("Exploration de la carte");
+            }else{
+                startLocationUpdates();
+                followUser = true;
+                button.setText("La carte suit votre position");
+            }
+        });
+
+        updateGPS();
     }
 
     private void stopLocationUpdates() {
@@ -141,17 +159,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null);
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallBack,null);
         updateGPS();
     }
 
@@ -166,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(TAG, "grantResults : " +grantResults[0]);
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "grantResults[0] = "+ PackageManager.PERMISSION_GRANTED);
-                    updateGPS();
+                    startLocationUpdates();
                     Log.d(TAG, "GPS UPDATED");
 
                 } else {
@@ -214,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void updateCurrentLocation(Location location) {
         currentRealLocation = location;
+        Button button = findViewById(R.id.coordinates);
+        button.setText(currentRealLocation.getLatitude() + " " + currentRealLocation.getLongitude());
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
         gestionnaireMap.setCenter(newLocation);
         gestionnaireMap.setZoom(20.0);
@@ -242,10 +252,13 @@ public class MainActivity extends AppCompatActivity implements
         loadAllPOIs();
 
         // This is temporary - only for demonstration
-        // Trst Arnaud
-        Button testArnaud = findViewById(R.id.test_arnaud);
-        testArnaud.setOnClickListener(v -> TempAlertExample.run());
-        // End temporary code
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
+            // Trst Arnaud
+            Button testArnaud = findViewById(R.id.test_arnaud);
+            testArnaud.setOnClickListener(v -> TempAlertExample.run());
+            // End temporary code
+        }
     }
 
     @Override
@@ -421,5 +434,11 @@ public class MainActivity extends AppCompatActivity implements
         gestionnaireMap.setCenter(poiPosition);
         gestionnaireMap.setZoom(20.0);
         openWeatherConditionUpdaterFragment(poi);
+    }
+
+    // Centre la map avec le GeoPoint donner dans la barre de recherche
+    @Override
+    public void relocateSearch(GeoPoint geoPoint) {
+        gestionnaireMap.setCenter(geoPoint);
     }
 }

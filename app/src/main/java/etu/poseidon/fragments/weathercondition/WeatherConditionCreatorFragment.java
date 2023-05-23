@@ -1,23 +1,18 @@
-package etu.poseidon.fragments;
+package etu.poseidon.fragments.weathercondition;
 
 import android.content.Context;
 import android.location.Location;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.util.ArrayMap;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -28,11 +23,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import org.osmdroid.util.GeoPoint;
 
-import java.util.Locale;
-import java.util.Map;
+import java.util.List;
 
 import etu.poseidon.R;
 import etu.poseidon.fragments.picture.PictureFragment;
+import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
 import etu.poseidon.webservices.pois.PoiApiClient;
@@ -40,7 +35,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class WeatherConditionCreatorFragment extends Fragment {
+public class WeatherConditionCreatorFragment extends Fragment implements WeatherConditionListSelectorFragment.OnWeatherConditionSelectedListener {
 
     public interface OnWeatherConditionCreatedListener {
         void onWeatherConditionCreated();
@@ -50,10 +45,6 @@ public class WeatherConditionCreatorFragment extends Fragment {
     private static final String ARG_MAP_LOCATION = "map_location_param";
     private Location currentRealLocation;
     private GeoPoint currentMapLocation;
-    private final int BUTTONS_PER_ROW = 3;
-    private final float BUTTONS_DP_SIZE = 90f;
-
-    private Map<WeatherCondition, Button> weatherButtons;
     private int perimeter = 10;
 
     private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
@@ -61,6 +52,8 @@ public class WeatherConditionCreatorFragment extends Fragment {
     private GoogleSignInAccount account;
     private Bitmap picture;
     private PictureFragment pictureFragment;
+    private WeatherConditionListSelectorFragment weatherConditionListSelectorFragment;
+    private WeatherCondition weatherConditionSelected;
 
     private RadioButton realLocationButton;
 
@@ -82,8 +75,6 @@ public class WeatherConditionCreatorFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_weather_condition_creator, container, false);
-
-        addWeatherButtons(view);
 
         SeekBar range = view.findViewById(R.id.range);
         TextView rangeValue = view.findViewById(R.id.range_value);
@@ -116,89 +107,22 @@ public class WeatherConditionCreatorFragment extends Fragment {
         TextView closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(v -> closeFragment());
 
+        // Picture fragment
         pictureFragment = new PictureFragment();
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_picture, pictureFragment);
         transaction.addToBackStack(null);
         transaction.commit();
 
+        // Weather condition list
+        weatherConditionListSelectorFragment = WeatherConditionListSelectorFragment.newInstance(false, List.of(WeatherCondition.SUN));
+        weatherConditionListSelectorFragment.setOnWeatherConditionListSelectedListener(this);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_weather_condition_list, weatherConditionListSelectorFragment).commit();
+
         realLocationButton = view.findViewById(R.id.radio_gps);
 
         // Inflate the layout for this fragment
         return view;
-    }
-
-    private void addWeatherButtons(View view){
-        weatherButtons = new ArrayMap<>();
-
-        LinearLayout parentLayout = view.findViewById(R.id.conditions);
-        LinearLayout currentLayout = new LinearLayout(getContext());
-        currentLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        currentLayout.setOrientation(LinearLayout.HORIZONTAL);
-        currentLayout.setGravity(Gravity.CENTER);
-        parentLayout.addView(currentLayout);
-
-        // Calculate width
-        int buttonCount = 0;
-
-        for (WeatherCondition condition : WeatherCondition.values()) {
-            buttonCount++;
-
-            Button button = new Button(getContext());
-            weatherButtons.put(condition, button);
-
-            // Define button icon
-            int iconId = getResources().getIdentifier("ic_weather_" + condition.name().toLowerCase(Locale.ROOT), "drawable", getContext().getPackageName());
-            button.setCompoundDrawablesWithIntrinsicBounds(0, iconId, 0, 0);
-
-            // Define button text
-            int stringId = getResources().getIdentifier("weather_" + condition.name().toLowerCase(Locale.ROOT), "string", getContext().getPackageName());
-            button.setText(stringId);
-
-            currentLayout.addView(button);
-
-            float pixelValue = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, BUTTONS_DP_SIZE, getResources().getDisplayMetrics());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((int) pixelValue, (int) pixelValue);
-            button.setLayoutParams(params);
-            // Set the first button to selected, the other not
-            if (buttonCount == 1) {
-                button.setBackgroundTintList(ResourcesCompat.getColorStateList(getResources(), R.color.green, null));
-                button.setTag("selected");
-            } else
-                button.setBackgroundTintList(ResourcesCompat.getColorStateList(getResources(), R.color.light_grey, null));
-
-            button.setOnClickListener(v -> handleWeatherButtonClicked(button));
-
-            // Create a new line if the current one is full
-            if (buttonCount%BUTTONS_PER_ROW == 0) {
-                LinearLayout newLine = new LinearLayout(getContext());
-                newLine.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                newLine.setOrientation(LinearLayout.HORIZONTAL);
-                newLine.setGravity(Gravity.CENTER);
-                parentLayout.addView(newLine);
-                currentLayout = newLine;
-            }
-        }
-    }
-
-    private void handleWeatherButtonClicked(Button button){
-        for(Button b : weatherButtons.values()){
-            if(b == button){
-                b.setBackgroundTintList(ResourcesCompat.getColorStateList(getResources(), R.color.green, null));
-                b.setTag("selected");
-            } else {
-                b.setBackgroundTintList(ResourcesCompat.getColorStateList(getResources(), R.color.light_grey, null));
-                b.setTag(null);
-            }
-        }
-    }
-
-    private WeatherCondition getSelectedWeatherCondition(){
-        for(Button b : weatherButtons.values()){
-            if(b.getTag() != null && b.getTag().equals("selected"))
-                return weatherButtons.keySet().stream().filter(key -> weatherButtons.get(key) == b).findFirst().get();
-        }
-        return null;
     }
 
     private void handleConfirmButton(){
@@ -216,7 +140,7 @@ public class WeatherConditionCreatorFragment extends Fragment {
             newPoi.setLatitude(currentMapLocation.getLatitude());
             newPoi.setLongitude(currentMapLocation.getLongitude());
         }
-        newPoi.setWeatherCondition(getSelectedWeatherCondition());
+        newPoi.setWeatherCondition(weatherConditionSelected);
         newPoi.setPerimeter(perimeter);
         newPoi.setCreatorEmail(account.getEmail());
         newPoi.setCreatorFullname(account.getDisplayName());
@@ -265,5 +189,11 @@ public class WeatherConditionCreatorFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onWeatherConditionSelected(List<WeatherCondition> conditions) {
+        // We know that only one weather condition is selected (we are not in multiSelect)
+        weatherConditionSelected = conditions.get(0);
     }
 }

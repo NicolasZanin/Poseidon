@@ -12,7 +12,7 @@
     android:layout_gravity="center"
     android:padding="10dp"
     android:background="@drawable/popup"
-    tools:context=".fragments.WeatherConditionCreatorFragment"
+    tools:context=".fragments.weathercondition.WeatherConditionCreatorFragment"
     >
 
     <TextView
@@ -30,14 +30,14 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
-    <LinearLayout
-        android:id="@+id/conditions"
+    <FrameLayout
+        android:id="@+id/fragment_weather_condition_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label_select_weather" />
+        app:layout_constraintTop_toBottomOf="@id/label_select_weather"
+        />
 
     <TextView
         android:id="@+id/range_value"
@@ -46,7 +46,7 @@
         android:text="@string/weather_condition_creator_perimeter"
         android:textSize="16sp"
         android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/conditions"
+        app:layout_constraintTop_toBottomOf="@id/fragment_weather_condition_list"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
