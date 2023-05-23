@@ -72,10 +72,11 @@
     <string name="profile_history_item_sample_coordinate">5.432453</string>
     <string name="profile_history_item_sample_duration">21 heures</string>
 
-    <string name="perimdapp">Périmètre appliqué :</string>
-    <string name="coordulieu">Coordonées du lieu :</string>
-    <string name="histordulieu">Historique du lieu</string>
-    <string name="hisoriclistlabel">Historique</string>
+    <!--history item -->
+    <string name="fragment_history_perimdapp">Périmètre appliqué :</string>
+    <string name="fragment_history_coordulieu">Coordonées du lieu :</string>
+    <string name="fragment_history_histordulieu">Historique du lieu</string>
+    <string name="fragment_history_hisoriclistlabel">Historique</string>
 
 
 
