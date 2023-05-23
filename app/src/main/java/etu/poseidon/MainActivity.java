@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements
         });
       
         findViewById(R.id.button_search).setOnClickListener( click -> {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_Search, new SearchFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment, new SearchFragment()).commit();
         });
       
         findViewById(R.id.coMap).setOnClickListener( click -> {
