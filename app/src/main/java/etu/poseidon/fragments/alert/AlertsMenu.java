@@ -100,10 +100,20 @@ public class AlertsMenu extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(etu.poseidon.R.layout.fragment_alerts_menu, container, false);
+
+
         ListView listView = view.findViewById(R.id.alerts_list);
+
+
         TextView closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(v -> {
             closeFragment();
+        });
+
+        Button addAlertButton = view.findViewById(R.id.alerts_menu_add_button);
+        addAlertButton.setOnClickListener(v -> {
+            closeFragment();
+            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment, new EditAlert()).commit();
         });
         loadAlerts(listView);
         return view;
