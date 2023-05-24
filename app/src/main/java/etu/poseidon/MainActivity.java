@@ -46,7 +46,7 @@ import java.util.Locale;
 import etu.poseidon.fragments.LoginFragment;
 import etu.poseidon.fragments.profile.ProfileFragment;
 import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
-import etu.poseidon.fragments.weathercondition.WeatherConditionUpdaterFragment;
+import etu.poseidon.fragments.weathercondition.updater.WeatherConditionUpdaterFragment;
 import etu.poseidon.fragments.picture.IPictureActivity;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
@@ -127,23 +127,23 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
-        findViewById(R.id.button_relocate).setOnClickListener( click -> {
+        findViewById(R.id.button_relocate).setOnClickListener(click -> {
             GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
                     currentRealLocation.getLongitude());
             gestionnaireMap.setCenter(geoPointActuel);
         });
-      
-        findViewById(R.id.button_search).setOnClickListener( click -> {
+
+        findViewById(R.id.button_search).setOnClickListener(click -> {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_Search, new SearchFragment()).commit();
         });
-      
-        findViewById(R.id.coMap).setOnClickListener( click -> {
+
+        findViewById(R.id.coMap).setOnClickListener(click -> {
             Button button = findViewById(R.id.coMap);
-            if(followUser){
+            if (followUser) {
                 stopLocationUpdates();
                 followUser = false;
                 button.setText("Exploration de la carte");
-            }else{
+            } else {
                 startLocationUpdates();
                 followUser = true;
                 button.setText("La carte suit votre position");
@@ -158,7 +158,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startLocationUpdates() {
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallBack,null);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "permission denied");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null);
         updateGPS();
     }
 
@@ -345,12 +350,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void openWeatherConditionUpdaterFragment(Poi poi){
         closeOpenedFragment();
-        WeatherConditionUpdaterFragment weatherConditionUpdaterFragment = new WeatherConditionUpdaterFragment();
-        Bundle args = new Bundle();
-        args.putParcelable("poi_param", poi);
-        weatherConditionUpdaterFragment.setArguments(args);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionUpdaterFragment).commit();
-        openedFragment = weatherConditionUpdaterFragment;
+        openedFragment = WeatherConditionUpdaterFragment.newInstance(poi);
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, openedFragment).commit();
     }
 
     private void openWeatherConditionCreatorFragment(){
@@ -368,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements
             args.putParcelable("map_location_param", location);
             weatherConditionCreatorFragment.setArguments(args);
 
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionCreatorFragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, weatherConditionCreatorFragment).commit();
             openedFragment = weatherConditionCreatorFragment;
         } else {
             openLoginFragment();
@@ -379,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements
         if(GoogleSignIn.getLastSignedInAccount(this) != null){
             closeOpenedFragment();
             ProfileFragment profileFragment = new ProfileFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) profileFragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, profileFragment).commit();
             openedFragment = profileFragment;
         } else {
             openLoginFragment();
@@ -389,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements
     private void openLoginFragment(){
         closeOpenedFragment();
         LoginFragment loginFragment = new LoginFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) loginFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, loginFragment).commit();
         openedFragment = loginFragment;
     }
 
@@ -401,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onWeatherConditionFinished() {
+    public void onWeatherConditionFinished(Poi poi) {
         removeAllPOIs();
         loadAllPOIs();
     }
