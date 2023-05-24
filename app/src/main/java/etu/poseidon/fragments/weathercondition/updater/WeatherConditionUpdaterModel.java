@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import java.util.Observable;
+import java.util.Observer;
 import java.util.Optional;
 
 import etu.poseidon.models.Poi;
@@ -13,6 +14,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class WeatherConditionUpdaterModel extends Observable implements IWeatherConditionUpdaterModel {
+
+    public enum WeatherConditionUpdaterApiState {
+        SAVING,
+        SAVED
+    }
 
     private Poi poiToUpdate;
 
@@ -24,9 +30,27 @@ public class WeatherConditionUpdaterModel extends Observable implements IWeather
 
     @Override
     public void updatePerimeter(int perimeter) {
-        poiToUpdate.setPerimeter(perimeter);
         setChanged();
-        notifyObservers();
+        notifyObservers(WeatherConditionUpdaterApiState.SAVING);
+        poiToUpdate.setPerimeter(perimeter);
+        PoiApiClient.getInstance().updatePoi(poiToUpdate.getId(), poiToUpdate, new Callback<Poi>() {
+            @Override
+            public void onResponse(Call<Poi> call, Response<Poi> response) {
+                if (response.isSuccessful()) {
+                    setChanged();
+                    notifyObservers(WeatherConditionUpdaterApiState.SAVED);
+                } else {
+                    setChanged();
+                    notifyObservers(WeatherConditionUpdaterApiState.SAVING);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Poi> call, Throwable t) {
+                setChanged();
+                notifyObservers(WeatherConditionUpdaterApiState.SAVING);
+            }
+        });
     }
 
     @Override

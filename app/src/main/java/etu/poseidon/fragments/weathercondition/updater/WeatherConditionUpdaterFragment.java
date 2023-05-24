@@ -33,9 +33,9 @@ public class WeatherConditionUpdaterFragment extends Fragment {
      *      - Gère la communication de la View au le Model
      */
 
-    IWeatherConditionUpdaterController controller;
-    IWeatherConditionUpdaterModel model;
-    IWeatherConditionUpdaterView view;
+    WeatherConditionUpdaterController controller;
+    WeatherConditionUpdaterModel model;
+    WeatherConditionUpdaterView view;
 
     private static final String ARG_POI = "poi_param";
     private Poi poiToUpdate;
@@ -68,6 +68,7 @@ public class WeatherConditionUpdaterFragment extends Fragment {
         controller = new WeatherConditionUpdaterController(model, view, this);
         view.setController(controller);
         model.setController(controller);
+        model.addObserver(view);
     }
 
     @Override

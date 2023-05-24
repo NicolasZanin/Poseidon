@@ -2,7 +2,7 @@ package etu.poseidon.fragments.weathercondition.updater;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -21,6 +21,9 @@ import etu.poseidon.models.Poi;
 public class WeatherConditionUpdaterView implements Observer, IWeatherConditionUpdaterView {
 
     IWeatherConditionUpdaterController controller;
+
+    LinearLayout editionSaveIngoing;
+    LinearLayout editionSaveCompleted;
 
     public void setContentView(Poi poiToUpdate, View view, Context context){
         // Setup information part
@@ -44,7 +47,16 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
 
     @Override
     public void update(Observable observable, Object o) {
-
+        if(observable instanceof WeatherConditionUpdaterModel && o instanceof WeatherConditionUpdaterModel.WeatherConditionUpdaterApiState){
+            WeatherConditionUpdaterModel model = (WeatherConditionUpdaterModel) observable;
+            if(o.equals(WeatherConditionUpdaterModel.WeatherConditionUpdaterApiState.SAVING)){
+                editionSaveIngoing.setVisibility(View.VISIBLE);
+                editionSaveCompleted.setVisibility(View.GONE);
+            } else {
+                editionSaveIngoing.setVisibility(View.GONE);
+                editionSaveCompleted.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void setDateTimeField(Poi poiToUpdate, TextView textView, Context context, DateFormat inputFormat, DateFormat outputFormat, String stringResource) {
@@ -130,6 +142,7 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
             TextView rangeValue = view.findViewById(R.id.edition_range_value);
             rangeValue.setText(context.getString(stringRange, (int) poiToUpdate.getPerimeter()));
 
+            // Range
             SeekBar range = view.findViewById(R.id.edition_range);
             range.setProgress((int) poiToUpdate.getPerimeter());
             range.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -137,15 +150,21 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     rangeValue.setText(context.getString(stringRange, progress));
-                    poiToUpdate.setPerimeter(progress);
                 }
 
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {}
 
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {}
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    controller.userActionUpdatePerimeter(seekBar.getProgress());
+                }
             });
+
+
+            // Retrieve layout to indicate saving status
+            editionSaveIngoing = view.findViewById(R.id.edition_save_ingoing);
+            editionSaveCompleted = view.findViewById(R.id.edition_save_completed);
         }
     }
 }
