@@ -21,6 +21,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -51,6 +52,7 @@ import etu.poseidon.fragments.picture.IPictureActivity;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
 import etu.poseidon.models.Poi;
+import etu.poseidon.models.weather.WeatherCondition;
 import etu.poseidon.temp.TempAlertExample;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
@@ -69,12 +71,15 @@ public class MainActivity extends AppCompatActivity implements
     private Fragment openedFragment;
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
+    public static final String TAG_SEARCH_FRAGMENT = "POSEIDON" + "SEARCH";
     public static final int DEFAULT_UPDATE_INTERVAL = 30;
     public static final int FAST_UPDATE_INTERVAL = 1;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
     public boolean followUser = false;
     private Bitmap picture;
+    private ArrayList<WeatherCondition> weatherSelected = new ArrayList<>();
+    private String searchText = "";
 
     LocationRequest locationRequest;
     LocationCallback locationCallBack;
@@ -130,11 +135,18 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.button_relocate).setOnClickListener( click -> {
             GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
                     currentRealLocation.getLongitude());
-            gestionnaireMap.setCenter(geoPointActuel);
+            gestionnaireMap.animateTo(geoPointActuel);
         });
-      
+
+        // Lors du clique sur le bouton recherche, ajoute en arguments pour le fragment l'historique
+        // du texte ainsi que les climats sélectionné
         findViewById(R.id.button_search).setOnClickListener( click -> {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment, new SearchFragment()).commit();
+            SearchFragment searchFragment = new SearchFragment();
+            Bundle args = new Bundle();
+            args.putParcelableArrayList(TAG_SEARCH_FRAGMENT, weatherSelected);
+            args.putCharSequence(TAG_SEARCH_FRAGMENT + "2", searchText);
+            searchFragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment, searchFragment).commit();
         });
       
         findViewById(R.id.coMap).setOnClickListener( click -> {
@@ -245,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements
         Button buttonProfile = findViewById(R.id.button_profile);
         buttonProfile.setOnClickListener(v -> openProfileFragment());
 
-        loadAllPOIs();
+        loadAllPOIs(false);
 
         // This is temporary - only for demonstration
         int orientation = getResources().getConfiguration().orientation;
@@ -288,12 +300,16 @@ public class MainActivity extends AppCompatActivity implements
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void loadAllPOIs(){
+    private void loadAllPOIs(boolean filter){
         PoiApiClient.getInstance().getPoiList(new Callback<List<Poi>>() {
             @Override
             public void onResponse(Call<List<Poi>> call, Response<List<Poi>> response) {
                 if (response.isSuccessful()) {
                     List<Poi> poiList = response.body();
+                    if (filter) {
+                        FilterPoi filterPoi = new FilterPoi(poiList);
+                        poiList = filterPoi.filtrePois(weatherSelected);
+                    }
                     for (Poi poi : poiList) {
                         addPOI(poi);
                     }
@@ -341,6 +357,7 @@ public class MainActivity extends AppCompatActivity implements
         // Vide la liste des points de la map
         map.getOverlays().clear();
         map.invalidate();
+
     }
 
     private void openWeatherConditionUpdaterFragment(Poi poi){
@@ -403,13 +420,13 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onWeatherConditionFinished() {
         removeAllPOIs();
-        loadAllPOIs();
+        loadAllPOIs(false);
     }
 
     @Override
     public void onWeatherConditionCreated() {
         removeAllPOIs();
-        loadAllPOIs();
+        loadAllPOIs(false);
     }
 
     @Override
@@ -424,6 +441,14 @@ public class MainActivity extends AppCompatActivity implements
     // Centre la map avec le GeoPoint donner dans la barre de recherche
     @Override
     public void relocateSearch(GeoPoint geoPoint) {
-        gestionnaireMap.setCenter(geoPoint);
+        gestionnaireMap.animateTo(geoPoint);
+    }
+
+    @Override
+    public void filterMap(ArrayList<WeatherCondition> weatherConditionList, String searchText) {
+        removeAllPOIs();
+        weatherSelected = weatherConditionList;
+        this.searchText = searchText;
+        loadAllPOIs(true);
     }
 }
