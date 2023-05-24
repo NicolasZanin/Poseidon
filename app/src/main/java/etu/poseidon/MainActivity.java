@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements
     private Bitmap picture;
     private ArrayList<WeatherCondition> weatherSelected = new ArrayList<>();
     private String searchText = "";
+    private Marker markerCenter = null;
 
     LocationRequest locationRequest;
     LocationCallback locationCallBack;
@@ -151,6 +152,15 @@ public class MainActivity extends AppCompatActivity implements
       
         findViewById(R.id.coMap).setOnClickListener( click -> {
             Button button = findViewById(R.id.coMap);
+
+            // Créer le point où se situe l'utilisateur
+            if (markerCenter == null) {
+                GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
+                        currentRealLocation.getLongitude());
+                markerCenter = PoiCreatorFactory.buildMarker(map, PoiCreatorFactory.PoiCondition.GLOBAL, geoPointActuel, this);
+                map.getOverlays().add(markerCenter);
+            }
+
             if(followUser){
                 stopLocationUpdates();
                 followUser = false;
@@ -232,6 +242,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateCurrentLocation(Location location) {
+        if (markerCenter != null)
+            markerCenter.setPosition(new GeoPoint(location));
         currentRealLocation = location;
         Button button = findViewById(R.id.coordinates);
         button.setText(currentRealLocation.getLatitude() + " " + currentRealLocation.getLongitude());
@@ -330,15 +342,9 @@ public class MainActivity extends AppCompatActivity implements
     private void addPOI(Poi poi) {
         // On crée un GeoPoint qui contient une latitude et une longitude
         GeoPoint poiPosition = new GeoPoint(poi.getLatitude(), poi.getLongitude());
-        // On crée une icone
-        Marker poiMarker = new Marker(map);
-        // On paramètre la position de l'icone avec le Geopoint créer auparavant
-        poiMarker.setPosition(poiPosition);
 
-        // Set resource icon dynamically with poi.getType()
-        int poiIconId = getResources().getIdentifier("ic_poi_" + poi.getWeatherCondition().name().toLowerCase(Locale.ROOT), "drawable", getPackageName());
-        Drawable poiIcon = ResourcesCompat.getDrawable(getResources(), poiIconId, getTheme());
-        poiMarker.setIcon(poiIcon);
+        Marker poiMarker = PoiCreatorFactory.buildMarker(map, PoiCreatorFactory.convertWeatherConditionPoiCondition(poi.getWeatherCondition()),
+                poiPosition, this);
 
         // On récupère la liste des points de la map et on ajoute le point sur cette liste pour
         // ajouter sur la map
