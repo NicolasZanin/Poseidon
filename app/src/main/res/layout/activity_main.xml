@@ -101,16 +101,6 @@
         />
 
     <FrameLayout
-        android:id="@+id/fragment_Search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/grey"
-        android:elevation="10dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <FrameLayout
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
