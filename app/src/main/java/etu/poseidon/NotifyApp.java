@@ -23,8 +23,10 @@ public class NotifyApp extends Application {
             channel = new NotificationChannel(CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
 
         NotificationManager manager = getSystemService(NotificationManager.class);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        Log.d("NotifyApp condition", String.valueOf(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             manager.createNotificationChannel(channel);
+        }
 
 
     }
