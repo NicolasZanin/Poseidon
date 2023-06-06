@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements
         Button buttonAlert = findViewById(R.id.button_alert_menu);
         buttonAlert.setOnClickListener(v -> openAlertFragment());
 
-        loadAllPOIs();
+        loadAllPOIs(false);
 
         // This is temporary - only for demonstration
         int orientation = getResources().getConfiguration().orientation;
