@@ -398,7 +398,19 @@ public class MainActivity extends AppCompatActivity implements
     private void openAlertFragment(){
         if(GoogleSignIn.getLastSignedInAccount(this) != null){
             closeOpenedFragment();
+
             AlertsMenu alertFragment = new AlertsMenu();
+
+            Bundle args = new Bundle();
+            // Real location
+            args.putParcelable("real_location_param", currentRealLocation);
+            alertFragment.setArguments(args);
+
+            // Map location
+            GeoPoint location = new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
+            args.putParcelable("map_location_param", location);
+            alertFragment.setArguments(args);
+
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) alertFragment).commit();
             openedFragment = alertFragment;
         } else {

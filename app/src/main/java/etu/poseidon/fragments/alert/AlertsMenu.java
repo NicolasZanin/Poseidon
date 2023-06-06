@@ -1,5 +1,6 @@
 package etu.poseidon.fragments.alert;
 
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -16,6 +17,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+
+import org.osmdroid.util.GeoPoint;
 
 import java.util.List;
 
@@ -35,6 +38,11 @@ public class AlertsMenu extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
+    private static final String ARG_REAL_LOCATION = "real_location_param";
+    private static final String ARG_MAP_LOCATION = "map_location_param";
+    private Location currentRealLocation;
+    private GeoPoint currentMapLocation;
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
 
     GoogleSignInClient mGoogleSignInClient;
@@ -93,6 +101,10 @@ public class AlertsMenu extends Fragment {
         mGoogleSignInClient = GoogleSignIn.getClient(this.requireContext(), gso);
         loggedInAccount = GoogleSignIn.getLastSignedInAccount(this.requireContext());
 
+        if (getArguments() != null) {
+            currentRealLocation = getArguments().getParcelable(ARG_REAL_LOCATION);
+            currentMapLocation = getArguments().getParcelable(ARG_MAP_LOCATION);
+        }
     }
 
     @Override
@@ -113,7 +125,17 @@ public class AlertsMenu extends Fragment {
         Button addAlertButton = view.findViewById(R.id.alerts_menu_add_button);
         addAlertButton.setOnClickListener(v -> {
             closeFragment();
-            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment, new EditAlert()).commit();
+            // TODO :add location
+            EditAlert editAlertFragment = new EditAlert();
+            Bundle args = new Bundle();
+            // Real location
+            args.putParcelable("real_location_param", currentRealLocation);
+            editAlertFragment.setArguments(args);
+
+            // Map location
+            args.putParcelable("map_location_param", currentMapLocation);
+            editAlertFragment.setArguments(args);
+            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment, editAlertFragment).commit();
         });
         loadAlerts(listView);
         return view;
