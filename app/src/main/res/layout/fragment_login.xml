@@ -24,7 +24,8 @@
         android:paddingBottom="10dp"
         android:text="@string/connection_google"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        app:autoSizePresetSizes="@array/autosize_text_sizes"
+        app:autoSizeTextType="uniform"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
