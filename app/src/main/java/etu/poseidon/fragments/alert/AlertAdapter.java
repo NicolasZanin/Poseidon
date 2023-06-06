@@ -93,7 +93,23 @@ public class AlertAdapter extends BaseAdapter {
         TextView deleteAlertTextView = layoutItem.findViewById(R.id.delete_alert);
         deleteAlertTextView.setOnClickListener(v -> {
             // TODO : delete alert from database
+            AlertApiClient.getInstance().deleteAlert(item.getId(), new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("Alert", "Alert deleted");
+                        items.remove(item);
+                        notifyDataSetChanged();
+                    } else {
+                        Log.e("Alert", "Alert not deleted");
+                    }
+                }
 
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.e("Alert", "Alert not deleted");
+                }
+            });
         });
 
         return layoutItem;
