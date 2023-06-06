@@ -380,20 +380,8 @@ public class MainActivity extends AppCompatActivity implements
     private void openWeatherConditionCreatorFragment(){
         if(GoogleSignIn.getLastSignedInAccount(this) != null){
             closeOpenedFragment();
-            WeatherConditionCreatorFragment weatherConditionCreatorFragment = new WeatherConditionCreatorFragment();
-
-            Bundle args = new Bundle();
-            // Real location
-            args.putParcelable("real_location_param", currentRealLocation);
-            weatherConditionCreatorFragment.setArguments(args);
-
-            // Map location
-            GeoPoint location = new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
-            args.putParcelable("map_location_param", location);
-            weatherConditionCreatorFragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, weatherConditionCreatorFragment).commit();
-            openedFragment = weatherConditionCreatorFragment;
+            openedFragment = WeatherConditionCreatorFragment.newInstance(currentRealLocation, new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude()));
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, openedFragment).commit();
         } else {
             openLoginFragment();
         }

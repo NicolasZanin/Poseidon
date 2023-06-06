@@ -61,6 +61,15 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         // Required empty public constructor
     }
 
+    public static WeatherConditionCreatorFragment newInstance(Location currentRealLocation, GeoPoint currentMapLocation) {
+        WeatherConditionCreatorFragment fragment = new WeatherConditionCreatorFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_REAL_LOCATION, currentRealLocation);
+        args.putParcelable(ARG_MAP_LOCATION, currentMapLocation);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
