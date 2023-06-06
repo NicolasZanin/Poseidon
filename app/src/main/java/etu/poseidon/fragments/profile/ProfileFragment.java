@@ -90,6 +90,7 @@ public class ProfileFragment extends Fragment {
         return view;
     }
     private void closeFragment(){
+        System.out.println("close fragment profile");
         requireActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
     }
 

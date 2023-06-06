@@ -45,15 +45,19 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.Locale;
 
 import etu.poseidon.fragments.LoginFragment;
+import etu.poseidon.fragments.alert.AlertsMenu;
+import etu.poseidon.fragments.alert.EditAlert;
 import etu.poseidon.fragments.profile.ProfileFragment;
 import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
 import etu.poseidon.fragments.weathercondition.updater.WeatherConditionUpdaterFragment;
 import etu.poseidon.fragments.picture.IPictureActivity;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
+import etu.poseidon.models.Alert;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
 import etu.poseidon.temp.TempAlertExample;
+import etu.poseidon.webservices.alerts.AlertApiClient;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,7 +68,9 @@ public class MainActivity extends AppCompatActivity implements
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnLocateButtonClickedListener,
         SearchFragment.OnSearchFragmentListener,
-        IPictureActivity {
+        IPictureActivity,
+        EditAlert.OnConfirmEditAlertListener
+{
     private MapView map;
     private IMapController gestionnaireMap;
 
@@ -274,7 +280,10 @@ public class MainActivity extends AppCompatActivity implements
         Button buttonProfile = findViewById(R.id.button_profile);
         buttonProfile.setOnClickListener(v -> openProfileFragment());
 
-        loadAllPOIs(false);
+        Button buttonAlert = findViewById(R.id.button_alert_menu);
+        buttonAlert.setOnClickListener(v -> openAlertFragment());
+
+        loadAllPOIs();
 
         // This is temporary - only for demonstration
         int orientation = getResources().getConfiguration().orientation;
@@ -398,6 +407,29 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private void openAlertFragment(){
+        if(GoogleSignIn.getLastSignedInAccount(this) != null){
+            closeOpenedFragment();
+
+            AlertsMenu alertFragment = new AlertsMenu();
+
+            Bundle args = new Bundle();
+            // Real location
+            args.putParcelable("real_location_param", currentRealLocation);
+            alertFragment.setArguments(args);
+
+            // Map location
+            GeoPoint location = new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
+            args.putParcelable("map_location_param", location);
+            alertFragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) alertFragment).commit();
+            openedFragment = alertFragment;
+        } else {
+            openLoginFragment();
+        }
+    }
+
     private void openLoginFragment(){
         closeOpenedFragment();
         LoginFragment loginFragment = new LoginFragment();
@@ -445,5 +477,43 @@ public class MainActivity extends AppCompatActivity implements
         weatherSelected = weatherConditionList;
         this.searchText = searchText;
         loadAllPOIs(true);
+    }
+    @Override
+    public void onAlertCreated(String type, Alert alert) {
+        Log.d("Alert", alert.toString());
+        if(type.equals("create")){
+            AlertApiClient.getInstance().createAlert(alert, new Callback<Alert>() {
+                @Override
+                public void onResponse(Call<Alert> call, Response<Alert> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("Alert", response.toString());
+                    } else {
+                        Log.e("Alert", response.toString());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Alert> call, Throwable t) {
+                    Log.e("Alert", "Alert 1 not created ERROR");
+                }
+            });
+        }
+        else if(type.equals("edit")){
+            AlertApiClient.getInstance().updateAlert(alert.getId(), alert, new Callback<Alert>() {
+                @Override
+                public void onResponse(Call<Alert> call, Response<Alert> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("Alert", response.toString());
+                    } else {
+                        Log.e("Alert", response.toString());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Alert> call, Throwable t) {
+                    Log.e("Alert", "Alert 1 not updated ERROR");
+                }
+            });
+        }
     }
 }
