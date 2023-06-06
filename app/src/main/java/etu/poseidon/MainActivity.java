@@ -24,12 +24,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -41,8 +39,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsDisplay;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-
-import java.util.Locale;
 
 import etu.poseidon.fragments.LoginFragment;
 import etu.poseidon.fragments.alert.AlertsMenu;
@@ -56,7 +52,6 @@ import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
 import etu.poseidon.models.Alert;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
-import etu.poseidon.temp.TempAlertExample;
 import etu.poseidon.webservices.alerts.AlertApiClient;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
@@ -284,15 +279,6 @@ public class MainActivity extends AppCompatActivity implements
         buttonAlert.setOnClickListener(v -> openAlertFragment());
 
         loadAllPOIs(false);
-
-        // This is temporary - only for demonstration
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
-            // Trst Arnaud
-            Button testArnaud = findViewById(R.id.test_arnaud);
-            testArnaud.setOnClickListener(v -> TempAlertExample.run());
-            // End temporary code
-        }
     }
 
     @Override
