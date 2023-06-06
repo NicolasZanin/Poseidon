@@ -49,10 +49,11 @@ public class AlertAdapter extends BaseAdapter {
         TextView alertNameTextView = layoutItem.findViewById(R.id.title);
         Switch alertEnabledSwitch = layoutItem.findViewById(R.id.enabling_alert);
         alertNameTextView.setText(item.getName());
-        alertEnabledSwitch.setChecked(true);// TODO: set the switch to the correct value
-
+        alertEnabledSwitch.setChecked(item.getEnabled());// TODO: set the switch to the correct value
+        alertEnabledSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    // TODO: update database
+                });
         layoutItem.setOnClickListener(v -> {
-            // TODO: open the alert edition fragment
             EditAlert detailsFragment = new EditAlert(item);
             FragmentManager fragmentManager = ((AppCompatActivity) viewGroup.getContext()).getSupportFragmentManager();
             fragmentManager.beginTransaction()

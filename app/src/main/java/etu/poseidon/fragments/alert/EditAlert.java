@@ -1,11 +1,9 @@
 package etu.poseidon.fragments.alert;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.viewmodel.CreationExtras;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,13 +11,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextClock;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import etu.poseidon.R;
+import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
 import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
 import etu.poseidon.models.Alert;
 import etu.poseidon.models.weather.WeatherCondition;
@@ -32,11 +35,17 @@ import etu.poseidon.models.weather.WeatherCondition;
 public class EditAlert extends Fragment  implements WeatherConditionListSelectorFragment.OnWeatherConditionSelectedListener{
 
 
+    public interface OnConfirmEditAlertListener{
+        void onAlertCreated(String type, Alert alert);
+    }
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     // implements WeatherConditionListSelectorFragment.OnWeatherConditionSelectedListener
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private OnConfirmEditAlertListener onConfirmEditAlertListener;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -111,6 +120,47 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
         EditText description = view.findViewById(R.id.alert_description_input);
         description.setText(this.alert.getDescription());
 
+        SeekBar perimeter = view.findViewById(R.id.range);
+        perimeter.setProgress((int)this.alert.getPerimeter());
+        perimeter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                TextView perimeterValue = view.findViewById(R.id.range_value);
+                String perimeterText = "Périmètre : " + String.valueOf(progress) + " milles marin";
+                perimeterValue.setText(perimeterText);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Ne rien faire ici
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Ne rien faire ici
+            }
+        });
+
+        GoogleSignInAccount loggedInAccount = GoogleSignIn.getLastSignedInAccount(this.requireContext());
+        if (loggedInAccount != null) {
+            this.alert.setCreatorEmail(loggedInAccount.getEmail());
+            this.alert.setCreatorFullname(loggedInAccount.getDisplayName());
+        }
+
+        Button save = view.findViewById(R.id.confirm);
+        save.setOnClickListener(v -> {
+            this.alert.setName(name.getText().toString());
+            this.alert.setDescription(description.getText().toString());
+            Log.d("Edit alert", this.alert.toString());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            this.alert.setUpdatedAt(sdf.format(new Date()));
+            this.alert.setEnabled(true);
+            this.alert.setPerimeter(perimeter.getProgress());
+            Log.d("Edit alert", this.alert.toString());
+            // TODO: get location from map
+            this.onConfirmEditAlertListener.onAlertCreated(this.type, this.alert);
+            closeFragment(); // TODO: open alertMenuFragment if created or edited successfully
+        });
 
 
 
@@ -120,6 +170,17 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
 
     @Override
     public void onWeatherConditionSelected(List<WeatherCondition> conditions) {
+        this.alert.setListWeatherCondition(conditions);
+    }
 
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener) {
+            this.onConfirmEditAlertListener = (OnConfirmEditAlertListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnWeatherConditionCreatedListener");
+        }
     }
 }

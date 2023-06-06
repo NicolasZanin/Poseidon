@@ -114,7 +114,7 @@
     <Button
         android:id="@+id/button_alert_menu"
         android:background="@drawable/round_button"
-        android:drawableTop="@drawable/ic_btn_indicate_weather"
+        android:drawableTop="@drawable/ic_btn_alert"
         android:drawableTint="@color/white"
         android:textSize="0sp"
         android:layout_width="60dp"

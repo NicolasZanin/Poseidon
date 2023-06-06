@@ -32,6 +32,12 @@ public class Alert implements Parcelable {
     @SerializedName("updatedAt")
     private String updatedAt;
 
+    @SerializedName("enabled")
+    private Boolean enabled;
+
+    @SerializedName("perimeter")
+    private double perimeter;
+
     public Alert() {
     }
 
@@ -105,6 +111,22 @@ public class Alert implements Parcelable {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public double getPerimeter() {
+        return perimeter;
+    }
+
+    public void setPerimeter(double perimeter) {
+        this.perimeter = perimeter;
     }
 
     @Override

@@ -45,14 +45,17 @@ import java.util.Locale;
 
 import etu.poseidon.fragments.LoginFragment;
 import etu.poseidon.fragments.alert.AlertsMenu;
+import etu.poseidon.fragments.alert.EditAlert;
 import etu.poseidon.fragments.profile.ProfileFragment;
 import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
 import etu.poseidon.fragments.weathercondition.WeatherConditionUpdaterFragment;
 import etu.poseidon.fragments.picture.IPictureActivity;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
+import etu.poseidon.models.Alert;
 import etu.poseidon.models.Poi;
 import etu.poseidon.temp.TempAlertExample;
+import etu.poseidon.webservices.alerts.AlertApiClient;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -63,7 +66,9 @@ public class MainActivity extends AppCompatActivity implements
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnLocateButtonClickedListener,
         SearchFragment.OnSearchFragmentListener,
-        IPictureActivity {
+        IPictureActivity,
+        EditAlert.OnConfirmEditAlertListener
+{
     private MapView map;
     private IMapController gestionnaireMap;
 
@@ -440,5 +445,43 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void relocateSearch(GeoPoint geoPoint) {
         gestionnaireMap.setCenter(geoPoint);
+    }
+    @Override
+    public void onAlertCreated(String type, Alert alert) {
+        Log.d("Alert", alert.toString());
+        if(type.equals("create")){
+            AlertApiClient.getInstance().createAlert(alert, new Callback<Alert>() {
+                @Override
+                public void onResponse(Call<Alert> call, Response<Alert> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("Alert", response.toString());
+                    } else {
+                        Log.e("Alert", response.toString());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Alert> call, Throwable t) {
+                    Log.e("Alert", "Alert 1 not created ERROR");
+                }
+            });
+        }
+        else if(type.equals("edit")){
+            AlertApiClient.getInstance().updateAlert(alert.getId(), alert, new Callback<Alert>() {
+                @Override
+                public void onResponse(Call<Alert> call, Response<Alert> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("Alert", response.toString());
+                    } else {
+                        Log.e("Alert", response.toString());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Alert> call, Throwable t) {
+                    Log.e("Alert", "Alert 1 not updated ERROR");
+                }
+            });
+        }
     }
 }
