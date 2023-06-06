@@ -75,6 +75,7 @@ public class AlertsMenu extends Fragment {
                 if (response.isSuccessful()) {
                     Log.d("Alert", "Alerts for "+loggedInAccount.getEmail()+" retrieved");
                     List<Alert> alerts = response.body();
+                    Log.d("Liste alerte",alerts.toString());
                     container.setAdapter(new AlertAdapter(getContext(), alerts));
                 } else {
                     Log.e("Alert", "Alerts for user not retrieved");

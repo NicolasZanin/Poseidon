@@ -134,6 +134,7 @@ public class Alert implements Parcelable {
         return "Alert{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", enabled='" + enabled + '\'' +
                 ", description='" + description + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
