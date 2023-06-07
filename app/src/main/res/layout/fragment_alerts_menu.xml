@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:layout_margin="10dp"
     android:background="@drawable/popup"
+    android:id="@+id/alerts_menu_fragment_layout"
     tools:context=".fragments.alert.AlertsMenu">
 
     <TextView

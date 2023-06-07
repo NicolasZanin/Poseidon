@@ -74,6 +74,8 @@ public class PoiCreatorFactory extends AppCompatActivity {
                 break;
             case GLOBAL:
                 poiIconId = context.getResources().getIdentifier("ic_poi_global", "drawable", context.getPackageName());
+                poiMarker.setOnMarkerClickListener((marker, mapView) -> false);
+                poiMarker.setId("global");
                 break;
         }
         Drawable poiIcon = ResourcesCompat.getDrawable(context.getResources(), poiIconId, context.getTheme());

@@ -116,6 +116,9 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
 
         View view = inflater.inflate(etu.poseidon.R.layout.fragment_edit_alert, container, false);
 
+        // Avoid user miscliking on the activity holding when fragment open
+        view.findViewById(R.id.edit_alert_fragment_layout).setOnClickListener(v -> {});
+
         TextView close = view.findViewById(R.id.close_edit_alert);
         close.setOnClickListener(v -> {
             closeFragment();

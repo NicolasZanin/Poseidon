@@ -8,6 +8,7 @@
     android:layout_gravity="center"
     android:layout_margin="10dp"
     android:paddingBottom="10dp"
+    android:id="@+id/edit_alert_fragment_layout"
     tools:context=".fragments.alert.EditAlert">
 
 
