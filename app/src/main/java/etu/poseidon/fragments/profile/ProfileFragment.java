@@ -53,6 +53,9 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        // Avoid user miscliking on the activity holding when fragment open
+        view.findViewById(R.id.profile_fragment_layout).setOnClickListener(v -> {});
+
         Button logoutButton = view.findViewById(R.id.btnDeconnexion);
         ImageView profileImage = view.findViewById(R.id.imgProfil);
         TextView profileNameTextView = view.findViewById(R.id.txtNomProfil);

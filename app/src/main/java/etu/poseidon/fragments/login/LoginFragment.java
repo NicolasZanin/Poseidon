@@ -52,6 +52,9 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
+        // Avoid user miscliking on the activity holding when fragment open
+        view.findViewById(R.id.login_fragment_layout).setOnClickListener(v -> {});
+
         view.findViewById(R.id.sign_in_button).setOnClickListener(v -> signIn());
 
         view.findViewById(R.id.demo_login_button).setOnClickListener(v -> {

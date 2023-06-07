@@ -66,6 +66,9 @@ public class SearchFragment extends Fragment implements WeatherConditionListSele
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance) {
         rootView = inflater.inflate(R.layout.fragment_recherche, container, false);
 
+        // Avoid user miscliking on the activity holding when fragment open
+        rootView.findViewById(R.id.recherche_fragment_layout).setOnClickListener(v -> {});
+
         // Initie le fragment pour sélectionner les filtres
         WeatherConditionListSelectorFragment weatherConditionListSelectorFragment = WeatherConditionListSelectorFragment.newInstance(true, weatherSelected);
         weatherConditionListSelectorFragment.setOnWeatherConditionListSelectedListener(this);

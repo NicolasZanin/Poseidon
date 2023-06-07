@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +54,7 @@ import etu.poseidon.factories.PoiCreatorFactory;
 import etu.poseidon.R;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 
 import etu.poseidon.fragments.alert.EditAlert;
 import etu.poseidon.fragments.search.SearchFragment;
@@ -154,19 +156,6 @@ public class MainActivity extends AppCompatActivity implements Observer,
                 updateCurrentLocation(locationResult.getLastLocation());
             }
         };
-
-        // Relocate button
-        findViewById(R.id.button_relocate).setOnClickListener(click -> {
-            GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(), currentRealLocation.getLongitude());
-            gestionnaireMap.animateTo(geoPointActuel);
-            followUser = true;
-        });
-
-        // Lors du clique sur le bouton recherche, ajoute en arguments pour le fragment l'historique
-        // du texte ainsi que les climats sélectionné
-        findViewById(R.id.button_search).setOnClickListener( click -> {
-            fragmentManager.openSearchFragment(weatherSelected, searchText);
-        });
 
         // Location updates
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
@@ -296,10 +285,30 @@ public class MainActivity extends AppCompatActivity implements Observer,
         Button buttonAlert = findViewById(R.id.button_alert_menu);
         buttonAlert.setOnClickListener(v -> fragmentManager.openAlertFragment());
 
-        loadAllPOIs(false);
+        // Button to relocate the map to the user's GPS position
+        findViewById(R.id.button_relocate).setOnClickListener(click -> {
+            GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(), currentRealLocation.getLongitude());
+            gestionnaireMap.animateTo(geoPointActuel);
+            followUser = true;
+        });
 
+        // Button to open the search fragment
+        findViewById(R.id.button_search).setOnClickListener( click -> {
+            fragmentManager.openSearchFragment(weatherSelected, searchText);
+        });
+
+        // Button to reload all the POIs on the map
+        findViewById(R.id.button_refresh).setOnClickListener(click -> {
+            removeAllPOIs();
+            loadAllPOIs(true);
+        });
+
+        // Get the last signed in account
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account != null) Account.logIn(account);
+
+        // Load all POIs on the map (weather condition indicator)
+        loadAllPOIs(false);
     }
 
     @Override
@@ -380,9 +389,10 @@ public class MainActivity extends AppCompatActivity implements Observer,
      * Supprime tous les points de la carte
      */
     private void removeAllPOIs() {
-        // Vide la liste des points de la map
+        Optional<Overlay> blueDotMarker = map.getOverlays().stream().filter(o -> o instanceof Marker && ((Marker) o).getId().equals("global")).findFirst();
         map.getOverlays().clear();
         map.invalidate();
+        blueDotMarker.ifPresent(marker -> map.getOverlays().add(marker));
     }
 
     private void removePoi(double latitude, double longitude){

@@ -104,9 +104,10 @@ public class AlertsMenu extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(etu.poseidon.R.layout.fragment_alerts_menu, container, false);
 
+        // Avoid user miscliking on the activity holding when fragment open
+        view.findViewById(R.id.alerts_menu_fragment_layout).setOnClickListener(v -> {});
 
         ListView listView = view.findViewById(R.id.alerts_list);
-
 
         TextView closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(v -> {
