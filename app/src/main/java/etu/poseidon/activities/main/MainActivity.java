@@ -189,42 +189,42 @@ public class MainActivity extends AppCompatActivity implements Observer,
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MainActivityPermissions.REQUEST_FINE_LOCATION:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startLocationUpdates();
                 } else {
                     Toast.makeText(this, "Permission de localisation refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_LONG).show();
                 }
                 break;
             case MainActivityPermissions.REQUEST_CAMERA:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission d'utilisation de la caméra accordée", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "Permission d'utilisation de la caméra refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Permission d'utilisation de la caméra refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_LONG).show();
                 }
                 break;
             case MainActivityPermissions.REQUEST_MEDIA_WRITE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission d'écriture sur le stockage accordée", Toast.LENGTH_SHORT).show();
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(fragmentManager.getOpenedFragment() instanceof WeatherConditionCreatorFragment){
                         ((WeatherConditionCreatorFragment) fragmentManager.getOpenedFragment()).savePicture();
+                    } else {
+                        Toast.makeText(this, "Permission d'écriture sur le stockage accordée", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(this, "Permission d'écriture sur le stockage refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_SHORT).show();
                     if(fragmentManager.getOpenedFragment() instanceof WeatherConditionCreatorFragment){
-                        if(fragmentManager.getOpenedFragment() instanceof WeatherConditionCreatorFragment){
-                            ((WeatherConditionCreatorFragment) fragmentManager.getOpenedFragment()).closeFragmentWithUnsavedPicture();
-                        }
+                        ((WeatherConditionCreatorFragment) fragmentManager.getOpenedFragment()).closeFragmentWithUnsavedPicture();
+                    } else {
+                        Toast.makeText(this, "Permission d'écriture sur le stockage refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
             case MainActivityPermissions.REQUEST_MEDIA_READ:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission de lecture sur le stockage accordée", Toast.LENGTH_SHORT).show();
                     if(fragmentManager.getOpenedFragment() instanceof WeatherConditionUpdaterFragment){
                         ((WeatherConditionUpdaterFragment) fragmentManager.getOpenedFragment()).loadPicture();
                     }
                 } else {
-                    Toast.makeText(this, "Permission de lecture sur le stockage refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Permission de lecture sur le stockage refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_LONG).show();
                 }
                 break;
             default:
@@ -343,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
             if (resultCode == RESULT_OK) {
                 picture = (Bitmap) data.getExtras().get("data");
                 PictureFragment pictureFragment = (PictureFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_picture);
+                assert pictureFragment != null;
                 pictureFragment.setPicture(picture);
             } else if (resultCode == RESULT_CANCELED) {
                 Toast toast = Toast.makeText(this, "No picture taken", Toast.LENGTH_SHORT);

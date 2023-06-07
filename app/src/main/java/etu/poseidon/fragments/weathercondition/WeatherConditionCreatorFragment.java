@@ -198,7 +198,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
     }
 
     public void closeFragmentWithUnsavedPicture(){
-        Toast.makeText(getContext(), "La photo de l'indentification météorologique n'a pas été sauvegardée", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Votre alerte météorologique a bien été envoyé. Cependant, sans votre autorisation nous n'avons pas pu sauvegarder la photo.", Toast.LENGTH_LONG).show();
         closeFragment();
     }
 
