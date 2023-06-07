@@ -6,6 +6,9 @@
     <!-- Global messages -->
     <string name="global_error">Une erreur est survenue. Veuillez réessayer.</string>
 
+    <!-- Global button text -->
+    <string name="close_button">X</string>
+
     <!-- Weather conditions -->
     <string name="weather_sun">Soleil</string>
     <string name="weather_cloud">Nuages</string>
@@ -14,12 +17,15 @@
     <string name="weather_storm">Tornade</string>
     <string name="weather_rain">Pluie</string>
 
+    <!--  Alert item example text  -->
+    <string name="alert_item_cap_antibes">Cap d\'Antibes</string>
+
     <!-- Weather condition creator texts -->
     <string name="weather_condition_creator_perimeter">Périmètre : %1$d milles marin</string>
     <string name="weather_condition_creator_real_gps_position">Position GPS Réelle</string>
     <string name="weather_condition_creator_on_map_gps_position">Position sur la carte</string>
     <string name="weather_condition_creator_close_button">X</string>
-    <string name="weather_condition_creator_select_gps_position">Position GPS</string>
+    <string name="weather_condition_creator_select_gps_position">Position GPS :</string>
     <string name="weather_condition_creator_button_confirm">Confirmer</string>
     <string name="weather_condition_creator_button_cancel">Annuler</string>
     <string name="weather_condition_creator_select_weather_text">Sélectionner la condition météorologique de votre emplacement actuel</string>
@@ -30,7 +36,7 @@
     <string name="weather_condition_updater_title">Indication météorologique%1$s</string>
     <string name="weather_condition_updater_coordinates">Coordonnées : %1$f, %2$f</string>
     <string name="weather_condition_updater_current_condition">Condition actuelle : %1$s</string>
-    <string name="weather_condition_updater_perimeter">Périmètre : %1$d milles marin</string>
+    <string name="weather_condition_updater_perimeter">Périmètre : %1$d miles marin</string>
     <string name="weather_condition_updater_created_at">Créé le : %1$s</string>
     <string name="weather_condition_updater_last_update">Dernière mise à jour : %1$s</string>
     <string name="weather_condition_updater_added_by">Ajouté par : %1$s</string>
@@ -63,14 +69,16 @@
     <string name="fragment_profile_history_columns_duration">Durée</string>
     <string name="fragment_profile_history_columns_locate">Localiser</string>
     <string name="fragment_profile_history_aucun_events_notifies">Aucun événement notifié…</string>
-    <string name="edit_text_recherche">Rechercher...</string>
+    <string name="edit_text_recherche">Rechercher…</string>
 
     <!-- Profile history item -->
     <string name="profile_history_item_sample_date">08/05/2023</string>
     <string name="profile_history_item_finished">Terminé</string>
-    <string name="profile_history_item_ongoing">En cours...</string>
+    <string name="profile_history_item_ongoing">En cours…</string>
     <string name="profile_history_item_sample_coordinate">5.432453</string>
     <string name="profile_history_item_sample_duration">21 heures</string>
+    <string name="connection_google">Connectez-vous avec Google !</string>
+    <string name="bouton_quitter">X</string>
 
     <!-- Fragment History item -->
     <string name="fragment_history_perimdapp">Périmètre appliqué :</string>
@@ -86,4 +94,15 @@
     <string name="fragment_login_demo_account_title">Compte de démonstration</string>
     <string name="fragment_login_google_login_title">Connectez-vous avec Google !</string>
     <string name="fragment_login_close_button">X</string>
+
+    <!-- Fragment alerts menu text -->
+    <string name="fragment_alerts_menu_title_alerts">Vos alertes :</string>
+    <string name="fragment_alerts_menu_add_alert">Ajouter une alerte</string>
+
+    <!-- Fragment edit alert text -->
+    <string name="fragment_edit_alert_title_new_alert">Nouvelle alerte</string>
+    <string name="fragment_edit_alert_title_alert_name">Nom de l\'alerte :</string>
+    <string name="fragment_edit_alert_title_to_alert">M\'alerter de :</string>
+    <string name="fragment_edit_alert_title_description">Description :</string>
+    <string name="fragment_edit_alert_title_place">Zone :</string>
 </resources>

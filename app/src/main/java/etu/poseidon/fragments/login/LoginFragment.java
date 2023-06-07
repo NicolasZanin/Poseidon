@@ -20,6 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+
 import etu.poseidon.R;
 import etu.poseidon.models.Account;
 
@@ -50,6 +51,9 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+
+        // Avoid user miscliking on the activity holding when fragment open
+        view.findViewById(R.id.login_fragment_layout).setOnClickListener(v -> {});
 
         view.findViewById(R.id.sign_in_button).setOnClickListener(v -> signIn());
 

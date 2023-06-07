@@ -26,6 +26,9 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
     LinearLayout editionSaveCompleted;
 
     public void setContentView(Poi poiToUpdate, View view, Context context){
+        // Avoid user miscliking on the activity holding when fragment open
+        view.findViewById(R.id.weather_condition_updator_fragment_layout).setOnClickListener(v -> {});
+
         // Setup information part
         setupInformationPart(poiToUpdate, view, context);
 

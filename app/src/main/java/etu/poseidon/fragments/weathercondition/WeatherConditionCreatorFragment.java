@@ -80,6 +80,9 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_weather_condition_creator, container, false);
 
+        // Avoid user miscliking on the activity holding when fragment open
+        view.findViewById(R.id.weather_condition_creator_fragment_layout).setOnClickListener(v -> {});
+
         SeekBar range = view.findViewById(R.id.range);
         TextView rangeValue = view.findViewById(R.id.range_value);
 
