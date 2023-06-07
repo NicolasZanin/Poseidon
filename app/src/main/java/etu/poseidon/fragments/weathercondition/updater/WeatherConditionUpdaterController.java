@@ -22,7 +22,7 @@ public class WeatherConditionUpdaterController implements IWeatherConditionUpdat
 
     @Override
     public void modelDeleted(Optional<Poi> poi) {
-        poi.ifPresent(value -> fragment.getActivityListener().onWeatherConditionFinished(value));
+        poi.ifPresent(value -> fragment.getActivityListener().onWeatherConditionFinished(value.getLatitude(), value.getLongitude()));
         closeFragment();
     }
 

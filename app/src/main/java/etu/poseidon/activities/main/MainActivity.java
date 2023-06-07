@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -45,6 +44,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsDisplay;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 
 import etu.poseidon.Message;
 import etu.poseidon.activities.main.tools.FilterPoi;
@@ -72,7 +72,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements Observer,
-        WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
+        WeatherConditionUpdaterFragment.OnWeatherConditionFinishedListener,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnProfileLocateButtonClickedListener,
         SearchFragment.OnSearchFragmentListener,
@@ -383,19 +383,29 @@ public class MainActivity extends AppCompatActivity implements Observer,
         // Vide la liste des points de la map
         map.getOverlays().clear();
         map.invalidate();
+    }
 
+    private void removePoi(double latitude, double longitude){
+        for (Overlay overlay : map.getOverlays()) {
+            if (overlay instanceof Marker) {
+                Marker marker = (Marker) overlay;
+                if (marker.getPosition().getLatitude() == latitude && marker.getPosition().getLongitude() == longitude) {
+                    map.getOverlays().remove(marker);
+                    map.invalidate();
+                    break;
+                }
+            }
+        }
     }
 
     @Override
-    public void onWeatherConditionFinished(Poi poi) {
-        removeAllPOIs();
-        loadAllPOIs(false);
+    public void onWeatherConditionFinished(double latitude, double longitude) {
+        removePoi(latitude, longitude);
     }
 
     @Override
-    public void onWeatherConditionCreated() {
-        removeAllPOIs();
-        loadAllPOIs(false);
+    public void onWeatherConditionCreated(Poi newPoi) {
+        addPOI(newPoi);
     }
 
     @Override

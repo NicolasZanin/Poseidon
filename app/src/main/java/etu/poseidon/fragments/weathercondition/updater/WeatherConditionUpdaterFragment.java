@@ -40,10 +40,10 @@ public class WeatherConditionUpdaterFragment extends Fragment {
     private static final String ARG_POI = "poi_param";
     private Poi poiToUpdate;
 
-    public interface OnWeatherConditionDeletedListener {
-        void onWeatherConditionFinished(Poi poi);
+    public interface OnWeatherConditionFinishedListener {
+        void onWeatherConditionFinished(double latitude, double longitude);
     }
-    private OnWeatherConditionDeletedListener mListener;
+    private OnWeatherConditionFinishedListener mListener;
 
     public WeatherConditionUpdaterFragment() {
         // Required empty public constructor
@@ -83,8 +83,8 @@ public class WeatherConditionUpdaterFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnWeatherConditionDeletedListener) {
-            mListener = (OnWeatherConditionDeletedListener) context;
+        if (context instanceof OnWeatherConditionFinishedListener) {
+            mListener = (OnWeatherConditionFinishedListener) context;
         } else {
             throw new RuntimeException(context + " must implement OnWeatherConditionDeletedListener");
         }
@@ -96,7 +96,7 @@ public class WeatherConditionUpdaterFragment extends Fragment {
         mListener = null;
     }
 
-    public OnWeatherConditionDeletedListener getActivityListener() {
+    public OnWeatherConditionFinishedListener getActivityListener() {
         return mListener;
     }
 }
