@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -24,6 +25,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements
             }
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 isUserMovingMap = false;
+                updateCoordinatesText(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
             }
             return false;
         });
@@ -225,10 +228,6 @@ public class MainActivity extends AppCompatActivity implements
     private void updateCurrentLocation(Location location) {
         currentRealLocation = location;
 
-        // Update coordinates
-        Button button = findViewById(R.id.coordinates);
-        button.setText(currentRealLocation.getLatitude() + " " + currentRealLocation.getLongitude());
-
         // Update blue dot marker
         if (markerCenter != null)
             markerCenter.setPosition(new GeoPoint(location));
@@ -247,7 +246,19 @@ public class MainActivity extends AppCompatActivity implements
                 gestionnaireMap.setCenter(new GeoPoint(location.getLatitude(), location.getLongitude()));
                 isPositionOnMapSet = true;
             }
+
+            // Update coordinates
+            updateCoordinatesText(location.getLatitude(), location.getLongitude());
         }
+    }
+
+    void updateCoordinatesText(double latitude, double longitude){
+        DecimalFormat decimalFormat = new DecimalFormat("#.#######");
+        String formattedLatitude = decimalFormat.format(latitude);
+        String formattedLongitude = decimalFormat.format(longitude);
+        TextView currentCoordinates = findViewById(R.id.coordinates);
+        int stringCoordinates = getResources().getIdentifier("activity_main_coordonnees", "string", getPackageName());
+        currentCoordinates.setText(getString(stringCoordinates,formattedLatitude, formattedLongitude));
     }
 
     @Override
