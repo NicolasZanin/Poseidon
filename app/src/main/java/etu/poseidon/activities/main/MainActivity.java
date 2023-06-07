@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.activities.main;
 
 
 import androidx.annotation.NonNull;
@@ -6,34 +6,34 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.widget.Button;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -44,24 +44,27 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsDisplay;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 
-import java.util.Locale;
+import etu.poseidon.Message;
+import etu.poseidon.activities.main.tools.FilterPoi;
+import etu.poseidon.activities.main.tools.MainActivityFragmentManager;
+import etu.poseidon.factories.PoiCreatorFactory;
+import etu.poseidon.R;
 import java.util.Observable;
 import java.util.Observer;
 
-import etu.poseidon.fragments.LoginFragment;
-import etu.poseidon.fragments.alert.AlertsMenu;
 import etu.poseidon.fragments.alert.EditAlert;
-import etu.poseidon.fragments.profile.ProfileFragment;
+import etu.poseidon.fragments.search.SearchFragment;
 import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
-import etu.poseidon.fragments.weathercondition.WeatherConditionUpdaterFragment;
+import etu.poseidon.fragments.weathercondition.updater.WeatherConditionUpdaterFragment;
 import etu.poseidon.fragments.picture.IPictureActivity;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
+import etu.poseidon.models.Account;
 import etu.poseidon.models.Alert;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
-import etu.poseidon.temp.TempAlertExample;
 import etu.poseidon.webservices.alerts.AlertApiClient;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
@@ -69,9 +72,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements Observer,
-        WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
+        WeatherConditionUpdaterFragment.OnWeatherConditionFinishedListener,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
-        ProfileHistoryAdapter.OnLocateButtonClickedListener,
+        ProfileHistoryAdapter.OnProfileLocateButtonClickedListener,
         SearchFragment.OnSearchFragmentListener,
         IPictureActivity,
         EditAlert.OnConfirmEditAlertListener
@@ -80,17 +83,15 @@ public class MainActivity extends AppCompatActivity implements Observer,
     private MapView map;
     private IMapController gestionnaireMap;
 
-    private Fragment openedFragment;
+    private MainActivityFragmentManager fragmentManager;
 
     private String tokenFireBase;
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final String TAG_SEARCH_FRAGMENT = "POSEIDON" + "SEARCH";
-    public static final int DEFAULT_UPDATE_INTERVAL = 30;
     public static final int FAST_UPDATE_INTERVAL = 1;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
-    public static final int PERMISSIONS_COARSE_LOCATION = 98;
-    public boolean followUser = false;
+    private boolean followUser = true, isPositionOnMapSet = false, isUserMovingMap = false;
     private Bitmap picture;
     private ArrayList<WeatherCondition> weatherSelected = new ArrayList<>();
     private String searchText = "";
@@ -101,16 +102,17 @@ public class MainActivity extends AppCompatActivity implements Observer,
     FusedLocationProviderClient fusedLocationProviderClient;
     Location currentRealLocation;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Les configurations par défaut de l'appareil
-        Configuration.getInstance().load(getApplicationContext(),
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        Configuration.getInstance().load(getApplicationContext(),PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         setContentView(R.layout.activity_main);
-        // On récupère le layout de la map dans le activity_main.xml
-        map = findViewById(R.id.carte);
 
+        fragmentManager = new MainActivityFragmentManager(this);
+
+        map = findViewById(R.id.carte);
         // Récupère la map en ligne
         map.setTileSource(TileSourceFactory.MAPNIK);
 
@@ -121,19 +123,25 @@ public class MainActivity extends AppCompatActivity implements Observer,
                 CustomZoomButtonsDisplay.HorizontalPosition.RIGHT,
                 CustomZoomButtonsDisplay.VerticalPosition.CENTER);
 
-        // Crée le point de départ de classe GeoPoint qu'on pourra personnalisé
-        // par la suite (avantage du geoPoint) et doit être utilisé par le gestionnaire de la map
-        GeoPoint startPoint = new GeoPoint(43.65020, 7.00517);
+        // Touch listener to set if the user screen is following his real GPS position or not (used when GPS updates to move the map)
+        map.setOnTouchListener((v, event) -> {
+            if(event.getAction() == MotionEvent.ACTION_DOWN){
+                isUserMovingMap = true;
+            }
+            if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                followUser = false;
+            }
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                isUserMovingMap = false;
+                updateCoordinatesText(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
+            }
+            return false;
+        });
 
         // On récupère le gestionnaire de la map pour poser des points, centrer la position, le zoom, etc.
         gestionnaireMap = map.getController();
 
-        // Pour centrer la map sur la coordonnées stating point (43.65020, 7.00517)
-        // au démarrage de l'application
-        gestionnaireMap.setCenter(startPoint);
-
-        // Pour mettre le niveau de zoom à 20.0
-        gestionnaireMap.setZoom(20.0);
+        // Setup location services
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000 * FAST_UPDATE_INTERVAL);
         locationRequest.setFastestInterval(1000 * FAST_UPDATE_INTERVAL);
@@ -147,44 +155,22 @@ public class MainActivity extends AppCompatActivity implements Observer,
             }
         };
 
-        findViewById(R.id.button_relocate).setOnClickListener( click -> {
-            GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
-                    currentRealLocation.getLongitude());
+        // Relocate button
+        findViewById(R.id.button_relocate).setOnClickListener(click -> {
+            GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(), currentRealLocation.getLongitude());
             gestionnaireMap.animateTo(geoPointActuel);
+            followUser = true;
         });
 
         // Lors du clique sur le bouton recherche, ajoute en arguments pour le fragment l'historique
         // du texte ainsi que les climats sélectionné
         findViewById(R.id.button_search).setOnClickListener( click -> {
-            SearchFragment searchFragment = new SearchFragment();
-            Bundle args = new Bundle();
-            args.putParcelableArrayList(TAG_SEARCH_FRAGMENT, weatherSelected);
-            args.putCharSequence(TAG_SEARCH_FRAGMENT + "2", searchText);
-            searchFragment.setArguments(args);
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment, searchFragment).commit();
+            fragmentManager.openSearchFragment(weatherSelected, searchText);
         });
-      
-        findViewById(R.id.coMap).setOnClickListener( click -> {
-            Button button = findViewById(R.id.coMap);
 
-            // Créer le point où se situe l'utilisateur
-            if (markerCenter == null) {
-                GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
-                        currentRealLocation.getLongitude());
-                markerCenter = PoiCreatorFactory.buildMarker(map, PoiCreatorFactory.PoiCondition.GLOBAL, geoPointActuel, this);
-                map.getOverlays().add(markerCenter);
-            }
-
-            if(followUser){
-                stopLocationUpdates();
-                followUser = false;
-                button.setText("Exploration de la carte");
-            }else{
-                startLocationUpdates();
-                followUser = true;
-                button.setText("La carte suit votre position");
-            }
-        });
+        // Location updates
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        startLocationUpdates();
 
         updateGPS();
 
@@ -201,12 +187,13 @@ public class MainActivity extends AppCompatActivity implements Observer,
         });
     }
 
-    private void stopLocationUpdates() {
-        fusedLocationProviderClient.removeLocationUpdates(locationCallBack);
-    }
-
     private void startLocationUpdates() {
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallBack,null);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "permission denied");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null);
         updateGPS();
     }
 
@@ -246,19 +233,9 @@ public class MainActivity extends AppCompatActivity implements Observer,
     }
 
     private void updateGPS(){
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Permission Granted");
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        Log.d(TAG, "Location is not null : " + location.getLatitude() + " " + location.getLongitude());
-                        updateCurrentLocation(location);
-                    } else {
-                        Log.d(TAG, "Location is null");
-                    }
-                }
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) updateCurrentLocation(location);
             });
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -268,46 +245,61 @@ public class MainActivity extends AppCompatActivity implements Observer,
     }
 
     private void updateCurrentLocation(Location location) {
+        currentRealLocation = location;
+
+        // Update blue dot marker
         if (markerCenter != null)
             markerCenter.setPosition(new GeoPoint(location));
-        currentRealLocation = location;
-        Button button = findViewById(R.id.coordinates);
-        button.setText(currentRealLocation.getLatitude() + " " + currentRealLocation.getLongitude());
-        GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
-        gestionnaireMap.setCenter(newLocation);
-        gestionnaireMap.setZoom(20.0);
+        else {
+            GeoPoint geoPointActuel = new GeoPoint(location);
+            markerCenter = PoiCreatorFactory.buildMarker(map, PoiCreatorFactory.PoiCondition.GLOBAL, geoPointActuel, this);
+            map.getOverlays().add(markerCenter);
+        }
+
+        // Update map
+        if(followUser && !isUserMovingMap) {
+            // isPositionOnMapSet is used to set the zoom and center of the map only when the app starts
+            if(isPositionOnMapSet) gestionnaireMap.animateTo(new GeoPoint(location.getLatitude(), location.getLongitude()));
+            else {
+                gestionnaireMap.setZoom(20.0);
+                gestionnaireMap.setCenter(new GeoPoint(location.getLatitude(), location.getLongitude()));
+                isPositionOnMapSet = true;
+            }
+
+            // Update coordinates
+            updateCoordinatesText(location.getLatitude(), location.getLongitude());
+        }
+    }
+
+    void updateCoordinatesText(double latitude, double longitude){
+        DecimalFormat decimalFormat = new DecimalFormat("#.#######");
+        String formattedLatitude = decimalFormat.format(latitude);
+        String formattedLongitude = decimalFormat.format(longitude);
+        TextView currentCoordinates = findViewById(R.id.coordinates);
+        int stringCoordinates = getResources().getIdentifier("activity_main_coordonnees", "string", getPackageName());
+        currentCoordinates.setText(getString(stringCoordinates,formattedLatitude, formattedLongitude));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if(GoogleSignIn.getLastSignedInAccount(this) != null)
-            Log.d(TAG,"Logged account: " + GoogleSignIn.getLastSignedInAccount(this).getEmail());
-        else
-            Log.d(TAG,"No logged account");
-
         // Button to open weather condition creator
         Button buttonWeatherConditionCreator = findViewById(R.id.button_weather_condition_creator);
-        buttonWeatherConditionCreator.setOnClickListener(v -> openWeatherConditionCreatorFragment());
+        buttonWeatherConditionCreator.setOnClickListener(v -> fragmentManager.openWeatherConditionCreatorFragment());
 
         // Button to open profile
         Button buttonProfile = findViewById(R.id.button_profile);
-        buttonProfile.setOnClickListener(v -> openProfileFragment());
+        buttonProfile.setOnClickListener(v -> fragmentManager.openProfileFragment());
 
+        // Button to open alert
         Button buttonAlert = findViewById(R.id.button_alert_menu);
-        buttonAlert.setOnClickListener(v -> openAlertFragment());
+        buttonAlert.setOnClickListener(v -> fragmentManager.openAlertFragment());
 
-        loadAllPOIs(true);
+        loadAllPOIs(false);
 
-        // This is temporary - only for demonstration
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
-            // Trst Arnaud
-            Button testArnaud = findViewById(R.id.test_arnaud);
-            testArnaud.setOnClickListener(v -> TempAlertExample.run());
-            // End temporary code
-        }
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account != null) Account.logIn(account);
     }
 
     @Override
@@ -342,15 +334,16 @@ public class MainActivity extends AppCompatActivity implements Observer,
     }
 
     private void loadAllPOIs(boolean filter){
-        PoiApiClient.getInstance().getPoiList(new Callback<List<Poi>>() {
+        PoiApiClient.getInstance().getPoiList(new Callback<>() {
             @Override
-            public void onResponse(Call<List<Poi>> call, Response<List<Poi>> response) {
+            public void onResponse(@NonNull Call<List<Poi>> call, @NonNull Response<List<Poi>> response) {
                 if (response.isSuccessful()) {
                     List<Poi> poiList = response.body();
                     if (filter) {
                         FilterPoi filterPoi = new FilterPoi(poiList);
                         poiList = filterPoi.filtrePois(weatherSelected);
                     }
+                    assert poiList != null;
                     for (Poi poi : poiList) {
                         addPOI(poi);
                     }
@@ -358,8 +351,8 @@ public class MainActivity extends AppCompatActivity implements Observer,
             }
 
             @Override
-            public void onFailure(Call<List<Poi>> call, Throwable t) {
-                Log.e(TAG,"Error: " + t.getMessage());
+            public void onFailure(@NonNull Call<List<Poi>> call, @NonNull Throwable t) {
+                Log.e(TAG, "Error: " + t.getMessage());
             }
         });
     }
@@ -369,19 +362,17 @@ public class MainActivity extends AppCompatActivity implements Observer,
      * @param poi Point of interest, le point à ajouter
      */
     private void addPOI(Poi poi) {
-        // On crée un GeoPoint qui contient une latitude et une longitude
         GeoPoint poiPosition = new GeoPoint(poi.getLatitude(), poi.getLongitude());
 
         Marker poiMarker = PoiCreatorFactory.buildMarker(map, PoiCreatorFactory.convertWeatherConditionPoiCondition(poi.getWeatherCondition()),
                 poiPosition, this);
 
-        // On récupère la liste des points de la map et on ajoute le point sur cette liste pour
-        // ajouter sur la map
+        // On récupère la liste des points de la map et on ajoute le point sur cette liste pour ajouter sur la map
         map.getOverlays().add(poiMarker);
 
         // On ajoute un événement quand on clique sur l'icone ajouté
         poiMarker.setOnMarkerClickListener((marker, mapView) -> {
-            openWeatherConditionUpdaterFragment(poi);
+            fragmentManager.openWeatherConditionUpdaterFragment(poi);
             return false;
         });
     }
@@ -392,108 +383,38 @@ public class MainActivity extends AppCompatActivity implements Observer,
         // Vide la liste des points de la map
         map.getOverlays().clear();
         map.invalidate();
-
     }
 
-    private void openWeatherConditionUpdaterFragment(Poi poi){
-        closeOpenedFragment();
-        WeatherConditionUpdaterFragment weatherConditionUpdaterFragment = new WeatherConditionUpdaterFragment();
-        Bundle args = new Bundle();
-        args.putParcelable("poi_param", poi);
-        weatherConditionUpdaterFragment.setArguments(args);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionUpdaterFragment).commit();
-        openedFragment = weatherConditionUpdaterFragment;
-    }
-
-    private void openWeatherConditionCreatorFragment(){
-        if(GoogleSignIn.getLastSignedInAccount(this) != null){
-            closeOpenedFragment();
-            WeatherConditionCreatorFragment weatherConditionCreatorFragment = new WeatherConditionCreatorFragment();
-
-            Bundle args = new Bundle();
-            // Real location
-            args.putParcelable("real_location_param", currentRealLocation);
-            weatherConditionCreatorFragment.setArguments(args);
-
-            // Map location
-            GeoPoint location = new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
-            args.putParcelable("map_location_param", location);
-            weatherConditionCreatorFragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) weatherConditionCreatorFragment).commit();
-            openedFragment = weatherConditionCreatorFragment;
-        } else {
-            openLoginFragment();
-        }
-    }
-
-    private void openProfileFragment(){
-        if(GoogleSignIn.getLastSignedInAccount(this) != null){
-            closeOpenedFragment();
-            ProfileFragment profileFragment = new ProfileFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) profileFragment).commit();
-            openedFragment = profileFragment;
-        } else {
-            openLoginFragment();
-        }
-    }
-
-    private void openAlertFragment(){
-        if(GoogleSignIn.getLastSignedInAccount(this) != null){
-            closeOpenedFragment();
-
-            AlertsMenu alertFragment = new AlertsMenu();
-
-            Bundle args = new Bundle();
-            // Real location
-            args.putParcelable("real_location_param", currentRealLocation);
-            alertFragment.setArguments(args);
-
-            // Map location
-            GeoPoint location = new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
-            args.putParcelable("map_location_param", location);
-            alertFragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) alertFragment).commit();
-            openedFragment = alertFragment;
-        } else {
-            openLoginFragment();
-        }
-    }
-
-    private void openLoginFragment(){
-        closeOpenedFragment();
-        LoginFragment loginFragment = new LoginFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) loginFragment).commit();
-        openedFragment = loginFragment;
-    }
-
-    private void closeOpenedFragment() {
-        if (openedFragment != null) {
-            getSupportFragmentManager().beginTransaction().remove(openedFragment).commit();
-            openedFragment = null;
+    private void removePoi(double latitude, double longitude){
+        for (Overlay overlay : map.getOverlays()) {
+            if (overlay instanceof Marker) {
+                Marker marker = (Marker) overlay;
+                if (marker.getPosition().getLatitude() == latitude && marker.getPosition().getLongitude() == longitude) {
+                    map.getOverlays().remove(marker);
+                    map.invalidate();
+                    break;
+                }
+            }
         }
     }
 
     @Override
-    public void onWeatherConditionFinished() {
-        removeAllPOIs();
-        loadAllPOIs(false);
+    public void onWeatherConditionFinished(double latitude, double longitude) {
+        removePoi(latitude, longitude);
     }
 
     @Override
-    public void onWeatherConditionCreated() {
-        removeAllPOIs();
-        loadAllPOIs(false);
+    public void onWeatherConditionCreated(Poi newPoi) {
+        addPOI(newPoi);
     }
 
     @Override
-    public void onLocateButtonClicked(Poi poi) {
-        closeOpenedFragment();
+    public void onProfileLocateButtonClicked(Poi poi) {
+        fragmentManager.closeOpenedFragment();
         GeoPoint poiPosition = new GeoPoint(poi.getLatitude(), poi.getLongitude());
         gestionnaireMap.setCenter(poiPosition);
         gestionnaireMap.setZoom(20.0);
-        openWeatherConditionUpdaterFragment(poi);
+        fragmentManager.openWeatherConditionUpdaterFragment(poi);
     }
 
     // Centre la map avec le GeoPoint donner dans la barre de recherche
@@ -514,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
         Log.d("Alert", alert.toString());
         alert.setFireBaseToken(this.tokenFireBase);
         if(type.equals("create")){
-            AlertApiClient.getInstance().createAlert(alert, new Callback<Alert>() {
+            AlertApiClient.getInstance().createAlert(alert, new Callback<>() {
                 @Override
                 public void onResponse(Call<Alert> call, Response<Alert> response) {
                     if (response.isSuccessful()) {
@@ -547,6 +468,14 @@ public class MainActivity extends AppCompatActivity implements Observer,
                 }
             });
         }
+    }
+
+    public Location getCurrentRealLocation() {
+        return currentRealLocation;
+    }
+
+    public MapView getMap() {
+        return map;
     }
 
     @Override

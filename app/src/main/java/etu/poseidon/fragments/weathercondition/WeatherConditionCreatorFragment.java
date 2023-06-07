@@ -5,6 +5,7 @@ import android.location.Location;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -18,16 +19,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-
 import org.osmdroid.util.GeoPoint;
 
 import java.util.List;
+import java.util.Objects;
 
 import etu.poseidon.R;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
+import etu.poseidon.models.Account;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
 import etu.poseidon.webservices.pois.PoiApiClient;
@@ -38,7 +38,7 @@ import retrofit2.Response;
 public class WeatherConditionCreatorFragment extends Fragment implements WeatherConditionListSelectorFragment.OnWeatherConditionSelectedListener {
 
     public interface OnWeatherConditionCreatedListener {
-        void onWeatherConditionCreated();
+        void onWeatherConditionCreated(Poi newPoi);
     }
 
     private static final String ARG_REAL_LOCATION = "real_location_param";
@@ -49,16 +49,22 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
 
     private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
 
-    private GoogleSignInAccount account;
     private Bitmap picture;
-    private PictureFragment pictureFragment;
-    private WeatherConditionListSelectorFragment weatherConditionListSelectorFragment;
     private WeatherCondition weatherConditionSelected;
 
     private RadioButton realLocationButton;
 
     public WeatherConditionCreatorFragment() {
         // Required empty public constructor
+    }
+
+    public static WeatherConditionCreatorFragment newInstance(Location currentRealLocation, GeoPoint currentMapLocation) {
+        WeatherConditionCreatorFragment fragment = new WeatherConditionCreatorFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_REAL_LOCATION, currentRealLocation);
+        args.putParcelable(ARG_MAP_LOCATION, currentMapLocation);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -68,8 +74,6 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
             currentRealLocation = getArguments().getParcelable(ARG_REAL_LOCATION);
             currentMapLocation = getArguments().getParcelable(ARG_MAP_LOCATION);
         }
-
-        account = GoogleSignIn.getLastSignedInAccount(getContext());
     }
 
     @Override
@@ -80,7 +84,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         TextView rangeValue = view.findViewById(R.id.range_value);
 
         // Default value for range text
-        int stringRange = getResources().getIdentifier("weather_condition_creator_perimeter", "string", getContext().getPackageName());
+        int stringRange = getResources().getIdentifier("weather_condition_creator_perimeter", "string", requireContext().getPackageName());
         rangeValue.setText(getString(stringRange, 10));
 
         range.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -108,16 +112,16 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         closeButton.setOnClickListener(v -> closeFragment());
 
         // Picture fragment
-        pictureFragment = new PictureFragment();
-        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        PictureFragment pictureFragment = new PictureFragment();
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_picture, pictureFragment);
         transaction.addToBackStack(null);
         transaction.commit();
 
         // Weather condition list
-        weatherConditionListSelectorFragment = WeatherConditionListSelectorFragment.newInstance(false, List.of(WeatherCondition.SUN));
+        WeatherConditionListSelectorFragment weatherConditionListSelectorFragment = WeatherConditionListSelectorFragment.newInstance(false, List.of(WeatherCondition.SUN));
         weatherConditionListSelectorFragment.setOnWeatherConditionListSelectedListener(this);
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_weather_condition_list, weatherConditionListSelectorFragment).commit();
+        requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_weather_condition_list, weatherConditionListSelectorFragment).commit();
 
         realLocationButton = view.findViewById(R.id.radio_gps);
 
@@ -129,7 +133,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         Poi newPoi = new Poi();
         if(realLocationButton.isChecked()) {
             if(currentRealLocation == null) {
-                int stringError = getResources().getIdentifier("weather_condition_creator_no_gps", "string", getContext().getPackageName());
+                int stringError = getResources().getIdentifier("weather_condition_creator_no_gps", "string", requireContext().getPackageName());
                 Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_LONG).show();
                 closeFragment();
                 return;
@@ -142,19 +146,20 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         }
         newPoi.setWeatherCondition(weatherConditionSelected);
         newPoi.setPerimeter(perimeter);
-        newPoi.setCreatorEmail(account.getEmail());
-        newPoi.setCreatorFullname(account.getDisplayName());
+        newPoi.setCreatorEmail(Account.getEmail());
+        newPoi.setCreatorFullname(Account.getDisplayName());
 
         PoiApiClient.getInstance().createPoi(newPoi, new Callback<Poi>() {
             @Override
-            public void onResponse(Call<Poi> call, Response<Poi> response) {
+            public void onResponse(@NonNull Call<Poi> call, @NonNull Response<Poi> response) {
                 if (response.isSuccessful()) {
-                    int stringSuccess = getResources().getIdentifier("weather_condition_creator_weather_sent", "string", getContext().getPackageName());
+                    Poi poi = response.body();
+                    int stringSuccess = getResources().getIdentifier("weather_condition_creator_weather_sent", "string", requireContext().getPackageName());
                     Toast.makeText(getContext(), getString(stringSuccess), Toast.LENGTH_SHORT).show();
-                    mListener.onWeatherConditionCreated();
+                    mListener.onWeatherConditionCreated(poi);
                     closeFragment();
                 } else {
-                    int stringError = getResources().getIdentifier("global_error", "string", getContext().getPackageName());
+                    int stringError = getResources().getIdentifier("global_error", "string", requireContext().getPackageName());
                     Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
                     Log.e("POSEIDON", "Error: " + response.code() + " " + response.message());
                     closeFragment();
@@ -162,8 +167,8 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
             }
 
             @Override
-            public void onFailure(Call<Poi> call, Throwable t) {
-                int stringError = getResources().getIdentifier("global_error", "string", getContext().getPackageName());
+            public void onFailure(@NonNull Call<Poi> call, @NonNull Throwable t) {
+                int stringError = getResources().getIdentifier("global_error", "string", requireContext().getPackageName());
                 Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
                 Log.e("POSEIDON", "Error: " + t.getMessage());
                 closeFragment();
@@ -176,7 +181,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener) {
             mListener = (WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener) context;

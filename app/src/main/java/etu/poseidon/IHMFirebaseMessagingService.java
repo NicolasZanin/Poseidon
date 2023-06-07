@@ -13,6 +13,8 @@ import androidx.core.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import etu.poseidon.activities.main.MainActivity;
+
 public class IHMFirebaseMessagingService extends FirebaseMessagingService {
 
 

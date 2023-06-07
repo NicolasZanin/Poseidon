@@ -3,6 +3,7 @@ package etu.poseidon.fragments.alert;
 import android.location.Location;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -13,16 +14,12 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-
 import org.osmdroid.util.GeoPoint;
 
 import java.util.List;
 
 import etu.poseidon.R;
+import etu.poseidon.models.Account;
 import etu.poseidon.models.Alert;
 import etu.poseidon.webservices.alerts.AlertApiClient;
 import retrofit2.Call;
@@ -45,8 +42,6 @@ public class AlertsMenu extends Fragment {
     private GeoPoint currentMapLocation;
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
 
-    GoogleSignInClient mGoogleSignInClient;
-    GoogleSignInAccount loggedInAccount;
     public AlertsMenu() {
         // Required empty public constructor
     }
@@ -68,14 +63,15 @@ public class AlertsMenu extends Fragment {
 
 
     private void loadAlerts(ListView container){
-        AlertApiClient.getInstance().getAlertsForUser(loggedInAccount.getEmail(), new Callback<List<Alert>>() {
+        AlertApiClient.getInstance().getAlertsForUser(Account.getEmail(), new Callback<>() {
             @Override
-            public void onResponse(Call<List<Alert>> call, Response<List<Alert>> response) {
-                Log.e(TAG,"email: " + loggedInAccount.getEmail());
+            public void onResponse(@NonNull Call<List<Alert>> call, @NonNull Response<List<Alert>> response) {
+                Log.e(TAG, "email: " + Account.getEmail());
                 if (response.isSuccessful()) {
-                    Log.d("Alert", "Alerts for "+loggedInAccount.getEmail()+" retrieved");
+                    Log.d("Alert", "Alerts for " + Account.getEmail() + " retrieved");
                     List<Alert> alerts = response.body();
-                    Log.d("Liste alerte",alerts.toString());
+                    assert alerts != null;
+                    Log.d("Liste alerte", alerts.toString());
                     container.setAdapter(new AlertAdapter(getContext(), alerts));
                 } else {
                     Log.e("Alert", "Alerts for user not retrieved");
@@ -85,10 +81,9 @@ public class AlertsMenu extends Fragment {
             }
 
 
-
             @Override
-            public void onFailure(Call<List<Alert>> call, Throwable t) {
-                Log.e(TAG,"Error: " + t.getMessage());
+            public void onFailure(@NonNull Call<List<Alert>> call, @NonNull Throwable t) {
+                Log.e(TAG, "Error: " + t.getMessage());
             }
         });
     }
@@ -96,11 +91,6 @@ public class AlertsMenu extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this.requireContext(), gso);
-        loggedInAccount = GoogleSignIn.getLastSignedInAccount(this.requireContext());
 
         if (getArguments() != null) {
             currentRealLocation = getArguments().getParcelable(ARG_REAL_LOCATION);
