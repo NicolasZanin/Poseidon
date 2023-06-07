@@ -12,6 +12,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,6 +34,8 @@ import android.graphics.drawable.Drawable;
 import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -43,6 +46,8 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 
 import etu.poseidon.fragments.LoginFragment;
 import etu.poseidon.fragments.alert.AlertsMenu;
@@ -63,7 +68,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends AppCompatActivity implements Observer,
         WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnLocateButtonClickedListener,
@@ -71,10 +76,13 @@ public class MainActivity extends AppCompatActivity implements
         IPictureActivity,
         EditAlert.OnConfirmEditAlertListener
 {
+
     private MapView map;
     private IMapController gestionnaireMap;
 
     private Fragment openedFragment;
+
+    private String tokenFireBase;
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final String TAG_SEARCH_FRAGMENT = "POSEIDON" + "SEARCH";
@@ -179,6 +187,18 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         updateGPS();
+
+        Message.getInstance().addObserver(this);
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                System.out.println("Fetching FCM registration token failed");
+
+                return;
+            }
+            this.tokenFireBase = task.getResult();
+            // Log and toast
+            Log.d("TOKEN FIREBASE", task.getResult());
+        });
     }
 
     private void stopLocationUpdates() {
@@ -278,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements
         Button buttonAlert = findViewById(R.id.button_alert_menu);
         buttonAlert.setOnClickListener(v -> openAlertFragment());
 
-        loadAllPOIs();
+        loadAllPOIs(true);
 
         // This is temporary - only for demonstration
         int orientation = getResources().getConfiguration().orientation;
@@ -492,6 +512,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onAlertCreated(String type, Alert alert) {
         Log.d("Alert", alert.toString());
+        alert.setFireBaseToken(this.tokenFireBase);
         if(type.equals("create")){
             AlertApiClient.getInstance().createAlert(alert, new Callback<Alert>() {
                 @Override
@@ -526,5 +547,11 @@ public class MainActivity extends AppCompatActivity implements
                 }
             });
         }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        RemoteMessage message = (RemoteMessage) o;
+        System.out.println(message.getNotification().getTitle());
     }
 }

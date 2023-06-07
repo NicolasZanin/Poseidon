@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "463525992326",
+    "project_id": "poseidon-ffb1a",
+    "storage_bucket": "poseidon-ffb1a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463525992326:android:f84e67fb6281a9130bfe07",
+        "android_client_info": {
+          "package_name": "etu.poseidon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "463525992326-k0o0k4q54lm3l85ldql0ie1bmidepa8b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwFbLPvlTBJ72eJ5MeKANxqs8wELdsF28"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "463525992326-k0o0k4q54lm3l85ldql0ie1bmidepa8b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
