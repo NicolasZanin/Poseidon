@@ -32,7 +32,8 @@ import androidx.preference.PreferenceManager;
 import android.graphics.Bitmap;
 import android.widget.Button;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -42,10 +43,14 @@ import org.osmdroid.views.CustomZoomButtonsDisplay;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import etu.poseidon.Message;
 import etu.poseidon.activities.main.tools.FilterPoi;
 import etu.poseidon.activities.main.tools.MainActivityFragmentManager;
 import etu.poseidon.factories.PoiCreatorFactory;
 import etu.poseidon.R;
+import java.util.Observable;
+import java.util.Observer;
+
 import etu.poseidon.fragments.alert.EditAlert;
 import etu.poseidon.fragments.search.SearchFragment;
 import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
@@ -62,7 +67,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends AppCompatActivity implements Observer,
         WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnProfileLocateButtonClickedListener,
@@ -70,10 +75,13 @@ public class MainActivity extends AppCompatActivity implements
         IPictureActivity,
         EditAlert.OnConfirmEditAlertListener
 {
+
     private MapView map;
     private IMapController gestionnaireMap;
 
     private MainActivityFragmentManager fragmentManager;
+
+    private String tokenFireBase;
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final String TAG_SEARCH_FRAGMENT = "POSEIDON" + "SEARCH";
@@ -159,6 +167,20 @@ public class MainActivity extends AppCompatActivity implements
         // Location updates
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         startLocationUpdates();
+
+        updateGPS();
+
+        Message.getInstance().addObserver(this);
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                System.out.println("Fetching FCM registration token failed");
+
+                return;
+            }
+            this.tokenFireBase = task.getResult();
+            // Log and toast
+            Log.d("TOKEN FIREBASE", task.getResult());
+        });
     }
 
     private void startLocationUpdates() {
@@ -394,6 +416,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onAlertCreated(String type, Alert alert) {
         Log.d("Alert", alert.toString());
+        alert.setFireBaseToken(this.tokenFireBase);
         if(type.equals("create")){
             AlertApiClient.getInstance().createAlert(alert, new Callback<>() {
                 @Override
@@ -436,5 +459,11 @@ public class MainActivity extends AppCompatActivity implements
 
     public MapView getMap() {
         return map;
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        RemoteMessage message = (RemoteMessage) o;
+        System.out.println(message.getNotification().getTitle());
     }
 }

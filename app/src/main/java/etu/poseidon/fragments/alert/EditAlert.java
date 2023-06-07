@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.osmdroid.util.GeoPoint;
 
@@ -184,6 +185,7 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
                 this.alert.setLatitude(currentMapLocation.getLatitude());
                 this.alert.setLongitude(currentMapLocation.getLongitude());
             }
+            // add token to alert
             Log.d("Edit alert", this.alert.toString());
             // TODO: get location from map
             this.onConfirmEditAlertListener.onAlertCreated(this.type, this.alert);
