@@ -63,12 +63,12 @@
     <string name="fragment_profile_history_columns_duration">Durée</string>
     <string name="fragment_profile_history_columns_locate">Localiser</string>
     <string name="fragment_profile_history_aucun_events_notifies">Aucun événement notifié…</string>
-    <string name="edit_text_recherche">Rechercher...</string>
+    <string name="edit_text_recherche">Rechercher…</string>
 
     <!-- Profile history item -->
     <string name="profile_history_item_sample_date">08/05/2023</string>
     <string name="profile_history_item_finished">Terminé</string>
-    <string name="profile_history_item_ongoing">En cours...</string>
+    <string name="profile_history_item_ongoing">En cours…</string>
     <string name="profile_history_item_sample_coordinate">5.432453</string>
     <string name="profile_history_item_sample_duration">21 heures</string>
     <string name="connection_google">Connectez-vous avec Google !</string>
