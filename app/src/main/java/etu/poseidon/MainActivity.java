@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements Observer,
 
     private Fragment openedFragment;
 
+    private String tokenFireBase;
+
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final String TAG_SEARCH_FRAGMENT = "POSEIDON" + "SEARCH";
     public static final int DEFAULT_UPDATE_INTERVAL = 30;
@@ -193,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
 
                 return;
             }
+            this.tokenFireBase = task.getResult();
             // Log and toast
             Log.d("TOKEN FIREBASE", task.getResult());
         });
@@ -509,6 +512,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
     @Override
     public void onAlertCreated(String type, Alert alert) {
         Log.d("Alert", alert.toString());
+        alert.setFireBaseToken(this.tokenFireBase);
         if(type.equals("create")){
             AlertApiClient.getInstance().createAlert(alert, new Callback<Alert>() {
                 @Override

@@ -8,7 +8,6 @@ public class Message extends Observable {
 
     private static Message instance;
     private static RemoteMessage message;
-
     private Message(){
         super();
     }
@@ -37,7 +36,9 @@ public class Message extends Observable {
     public String getBody() {
         return message.getNotification().getBody();
     }
-
+    public String getWeather(){
+        return message.getData().get("weather");
+    }
     public boolean isNull(){
         return message.getNotification() == null;
     }

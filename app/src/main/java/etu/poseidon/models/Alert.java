@@ -32,6 +32,9 @@ public class Alert implements Parcelable {
     @SerializedName("updatedAt")
     private String updatedAt;
 
+    @SerializedName("fireBaseToken")
+    private String fireBaseToken;
+
     @SerializedName("enabled")
     private Boolean enabled;
 
@@ -41,6 +44,13 @@ public class Alert implements Parcelable {
     public Alert() {
     }
 
+    public String getFireBaseToken() {
+        return fireBaseToken;
+    }
+
+    public void setFireBaseToken(String fireBaseToken) {
+        this.fireBaseToken = fireBaseToken;
+    }
     public String getId() {
         return id;
     }
