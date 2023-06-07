@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="10dp"
@@ -63,19 +63,18 @@
         android:id="@+id/label_select_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_margin="10dp"
         android:text="@string/fragment_edit_alert_title_to_alert"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alert_name" />
+        app:layout_constraintLeft_toLeftOf="@id/fragment_weather_condition_list"
+        app:layout_constraintTop_toBottomOf="@id/edit_alert_title" />
 
     <FrameLayout
         android:id="@+id/fragment_weather_condition_list"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_select_weather" />
 
     <TextView
@@ -87,7 +86,7 @@
         android:text="@string/fragment_edit_alert_title_description"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fragment_weather_condition_list" />
+        app:layout_constraintTop_toBottomOf="@id/alert_name" />
 
     <EditText
         android:id="@+id/alert_description_input"
@@ -102,7 +101,7 @@
         app:layout_constraintTop_toTopOf="@id/label_description" />
 
     <TextView
-        android:id="@+id/description"
+        android:id="@+id/zone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -123,15 +122,16 @@
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/description" />
+        app:layout_constraintTop_toBottomOf="@id/zone" />
 
     <SeekBar
         android:id="@+id/range"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:progress="10"
+        android:layout_marginEnd="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/fragment_weather_condition_list"
         app:layout_constraintTop_toBottomOf="@id/range_value" />
 
     <TextView
@@ -151,10 +151,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/select_gps_postion">
 
