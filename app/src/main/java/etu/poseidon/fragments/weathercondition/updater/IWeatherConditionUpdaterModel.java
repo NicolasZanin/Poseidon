@@ -10,4 +10,5 @@ public interface IWeatherConditionUpdaterModel {
     void setController(IWeatherConditionUpdaterController controller);
     void setPoiFinished(Context context);
     void deletePoiDefinilety(Context context);
+    String getId();
 }

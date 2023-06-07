@@ -1,14 +1,23 @@
 package etu.poseidon.fragments.weathercondition;
 
+import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +30,12 @@ import android.widget.Toast;
 
 import org.osmdroid.util.GeoPoint;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
-import java.util.Objects;
 
 import etu.poseidon.R;
+import etu.poseidon.activities.main.tools.MainActivityPermissions;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
 import etu.poseidon.models.Account;
@@ -35,7 +46,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class WeatherConditionCreatorFragment extends Fragment implements WeatherConditionListSelectorFragment.OnWeatherConditionSelectedListener {
+public class WeatherConditionCreatorFragment extends Fragment implements WeatherConditionListSelectorFragment.OnWeatherConditionSelectedListener, PictureFragment.OnPictureTakenListener {
 
     public interface OnWeatherConditionCreatedListener {
         void onWeatherConditionCreated(Poi newPoi);
@@ -50,6 +61,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
     private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
 
     private Bitmap picture;
+    private Poi newPoi;
     private WeatherCondition weatherConditionSelected;
 
     private RadioButton realLocationButton;
@@ -116,6 +128,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
 
         // Picture fragment
         PictureFragment pictureFragment = new PictureFragment();
+        pictureFragment.setOnPictureTakenListener(this);
         FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_picture, pictureFragment);
         transaction.addToBackStack(null);
@@ -133,7 +146,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
     }
 
     private void handleConfirmButton(){
-        Poi newPoi = new Poi();
+        newPoi = new Poi();
         if(realLocationButton.isChecked()) {
             if(currentRealLocation == null) {
                 int stringError = getResources().getIdentifier("weather_condition_creator_no_gps", "string", requireContext().getPackageName());
@@ -156,11 +169,12 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
             @Override
             public void onResponse(@NonNull Call<Poi> call, @NonNull Response<Poi> response) {
                 if (response.isSuccessful()) {
-                    Poi poi = response.body();
+                    newPoi = response.body();
                     int stringSuccess = getResources().getIdentifier("weather_condition_creator_weather_sent", "string", requireContext().getPackageName());
                     Toast.makeText(getContext(), getString(stringSuccess), Toast.LENGTH_SHORT).show();
-                    mListener.onWeatherConditionCreated(poi);
-                    closeFragment();
+                    mListener.onWeatherConditionCreated(newPoi);
+                    if(picture != null) savePicture();
+                    else closeFragment();
                 } else {
                     int stringError = getResources().getIdentifier("global_error", "string", requireContext().getPackageName());
                     Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
@@ -183,13 +197,44 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         requireActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
     }
 
+    public void closeFragmentWithUnsavedPicture(){
+        Toast.makeText(getContext(), "Votre alerte météorologique a bien été envoyé. Cependant, sans votre autorisation nous n'avons pas pu sauvegarder la photo.", Toast.LENGTH_LONG).show();
+        closeFragment();
+    }
+
+    public void savePicture(){
+        if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MainActivityPermissions.REQUEST_MEDIA_WRITE);
+        } else {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, newPoi.getId() + ".jpg");
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/*");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            Uri externalUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            Uri imageUri = requireActivity().getContentResolver().insert(externalUri, contentValues);
+            if (imageUri != null) {
+                try {
+                    OutputStream outputStream = requireActivity().getContentResolver().openOutputStream(imageUri);
+                    if (outputStream != null) {
+                        picture.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                        outputStream.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            closeFragment();
+        }
+    }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener) {
             mListener = (WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnWeatherConditionCreatedListener");
+            throw new RuntimeException(context + " must implement OnWeatherConditionCreatedListener");
         }
     }
 
@@ -203,5 +248,10 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
     public void onWeatherConditionSelected(List<WeatherCondition> conditions) {
         // We know that only one weather condition is selected (we are not in multiSelect)
         weatherConditionSelected = conditions.get(0);
+    }
+
+    @Override
+    public void onPictureTaken(Bitmap picture) {
+        this.picture = picture;
     }
 }

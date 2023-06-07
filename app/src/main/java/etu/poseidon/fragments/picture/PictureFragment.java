@@ -17,8 +17,17 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import etu.poseidon.R;
+import etu.poseidon.activities.main.tools.MainActivityPermissions;
+import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
 
-public class PictureFragment extends Fragment{
+public class PictureFragment extends Fragment {
+
+    public interface OnPictureTakenListener {
+        void onPictureTaken(Bitmap picture);
+    }
+
+    private OnPictureTakenListener mListener;
+
     private ImageView imageView;
     private TextView photoTextIndicator;
 
@@ -50,10 +59,10 @@ public class PictureFragment extends Fragment{
         if (ContextCompat.checkSelfPermission( getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions( getActivity(),
                     new String[] {Manifest.permission.CAMERA},
-                    IPictureActivity.REQUEST_CAMERA);
+                    MainActivityPermissions.REQUEST_CAMERA);
         } else { //permission still GRANTED
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            getActivity().startActivityForResult(intent, IPictureActivity.REQUEST_CAMERA);
+            getActivity().startActivityForResult(intent, MainActivityPermissions.REQUEST_CAMERA);
         }
     }
 
@@ -70,6 +79,9 @@ public class PictureFragment extends Fragment{
         // Display the picture
         imageView.setVisibility(View.VISIBLE);
         imageView.setImageBitmap(picture);
+
+        if(mListener != null)
+            mListener.onPictureTaken(picture);
     }
 
     private void removePicture(){
@@ -85,5 +97,9 @@ public class PictureFragment extends Fragment{
         // Remove the picture
         imageView.setVisibility(View.GONE);
         imageView.setImageBitmap(null);
+    }
+
+    public void setOnPictureTakenListener(PictureFragment.OnPictureTakenListener listener) {
+        mListener = listener;
     }
 }

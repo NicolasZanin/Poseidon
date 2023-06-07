@@ -83,8 +83,9 @@
     <!-- Fragment History item -->
     <string name="fragment_history_perimdapp">Périmètre appliqué :</string>
     <string name="fragment_history_coordulieu">Coordonées du lieu :</string>
+    <string name="fragment_history_coorValue">42.0696969 , 6.942069</string>
     <string name="fragment_history_histordulieu">Historique du lieu</string>
-    <string name="fragment_history_hisoriclistlabel">Historique</string>
+    <string name="fragment_history_hisoriclistlabel">Historique :</string>
 
     <!-- Activity main item -->
     <string name="activity_main_coordonnees">%1$s, %2$s</string>
