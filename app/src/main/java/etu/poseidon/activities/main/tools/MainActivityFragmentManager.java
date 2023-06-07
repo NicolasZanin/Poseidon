@@ -100,4 +100,8 @@ public class MainActivityFragmentManager {
             openedFragment = null;
         }
     }
+
+    public Fragment getOpenedFragment() {
+        return openedFragment;
+    }
 }

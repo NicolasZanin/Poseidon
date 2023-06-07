@@ -3,8 +3,9 @@ package etu.poseidon.fragments.weathercondition.updater;
 import android.content.Context;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import java.util.Observable;
-import java.util.Observer;
 import java.util.Optional;
 
 import etu.poseidon.models.Poi;
@@ -20,7 +21,7 @@ public class WeatherConditionUpdaterModel extends Observable implements IWeather
         SAVED
     }
 
-    private Poi poiToUpdate;
+    private final Poi poiToUpdate;
 
     private IWeatherConditionUpdaterController controller;
 
@@ -35,7 +36,7 @@ public class WeatherConditionUpdaterModel extends Observable implements IWeather
         poiToUpdate.setPerimeter(perimeter);
         PoiApiClient.getInstance().updatePoi(poiToUpdate.getId(), poiToUpdate, new Callback<Poi>() {
             @Override
-            public void onResponse(Call<Poi> call, Response<Poi> response) {
+            public void onResponse(@NonNull Call<Poi> call, @NonNull Response<Poi> response) {
                 if (response.isSuccessful()) {
                     setChanged();
                     notifyObservers(WeatherConditionUpdaterApiState.SAVED);
@@ -46,7 +47,7 @@ public class WeatherConditionUpdaterModel extends Observable implements IWeather
             }
 
             @Override
-            public void onFailure(Call<Poi> call, Throwable t) {
+            public void onFailure(@NonNull Call<Poi> call, @NonNull Throwable t) {
                 setChanged();
                 notifyObservers(WeatherConditionUpdaterApiState.SAVING);
             }
@@ -70,7 +71,7 @@ public class WeatherConditionUpdaterModel extends Observable implements IWeather
     public void deletePoiDefinilety(Context context){
         PoiApiClient.getInstance().deletePoi(poiToUpdate.getId(), new Callback<Void>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
                     int stringSuccess = context.getResources().getIdentifier("weather_condition_updater_succefully_deleted_definitely", "string", context.getPackageName());
                     Toast.makeText(context, context.getString(stringSuccess), Toast.LENGTH_SHORT).show();
@@ -83,7 +84,7 @@ public class WeatherConditionUpdaterModel extends Observable implements IWeather
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 int stringError = context.getResources().getIdentifier("global_error", "string", context.getPackageName());
                 Toast.makeText(context, context.getString(stringError), Toast.LENGTH_SHORT).show();
                 controller.modelDeleted(Optional.empty());
@@ -95,7 +96,7 @@ public class WeatherConditionUpdaterModel extends Observable implements IWeather
         poiToUpdate.setFinished(true);
         PoiApiClient.getInstance().updatePoi(poiToUpdate.getId(), poiToUpdate, new Callback<Poi>() {
             @Override
-            public void onResponse(Call<Poi> call, Response<Poi> response) {
+            public void onResponse(@NonNull Call<Poi> call, @NonNull Response<Poi> response) {
                 if (response.isSuccessful()) {
                     int stringSuccess = context.getResources().getIdentifier("weather_condition_updater_succefully_deleted", "string", context.getPackageName());
                     Toast.makeText(context, context.getString(stringSuccess), Toast.LENGTH_SHORT).show();
@@ -108,11 +109,15 @@ public class WeatherConditionUpdaterModel extends Observable implements IWeather
             }
 
             @Override
-            public void onFailure(Call<Poi> call, Throwable t) {
+            public void onFailure(@NonNull Call<Poi> call, @NonNull Throwable t) {
                 int stringError = context.getResources().getIdentifier("global_error", "string", context.getPackageName());
                 Toast.makeText(context, context.getString(stringError), Toast.LENGTH_SHORT).show();
                 controller.modelDeleted(Optional.empty());
             }
         });
+    }
+
+    public String getId() {
+        return poiToUpdate.getId();
     }
 }

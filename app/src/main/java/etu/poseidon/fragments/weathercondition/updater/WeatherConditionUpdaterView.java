@@ -1,7 +1,10 @@
 package etu.poseidon.fragments.weathercondition.updater;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -20,26 +23,35 @@ import etu.poseidon.models.Poi;
 
 public class WeatherConditionUpdaterView implements Observer, IWeatherConditionUpdaterView {
 
-    IWeatherConditionUpdaterController controller;
+    private IWeatherConditionUpdaterController controller;
 
-    LinearLayout editionSaveIngoing;
-    LinearLayout editionSaveCompleted;
+    private LinearLayout editionSaveIngoing;
+    private LinearLayout editionSaveCompleted;
+
+    private View view;
+    private Context context;
 
     public void setContentView(Poi poiToUpdate, View view, Context context){
+        this.view = view;
+        this.context = context;
+
         // Avoid user miscliking on the activity holding when fragment open
         view.findViewById(R.id.weather_condition_updator_fragment_layout).setOnClickListener(v -> {});
 
+        // Say to the controller that we are opening the fragment to setup the POI picture
+        controller.userActionOpeningFragment();
+
         // Setup information part
-        setupInformationPart(poiToUpdate, view, context);
+        setupInformationPart(poiToUpdate);
 
         // Setup buttons
         setupButtons(view);
 
         // Edition part
-        setupEditionPart(poiToUpdate, view, context);
+        setupEditionPart(poiToUpdate);
 
         // Deletion part
-        setupDeletionPart(poiToUpdate, view, context);
+        setupDeletionPart(poiToUpdate);
     }
 
 
@@ -51,7 +63,6 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
     @Override
     public void update(Observable observable, Object o) {
         if(observable instanceof WeatherConditionUpdaterModel && o instanceof WeatherConditionUpdaterModel.WeatherConditionUpdaterApiState){
-            WeatherConditionUpdaterModel model = (WeatherConditionUpdaterModel) observable;
             if(o.equals(WeatherConditionUpdaterModel.WeatherConditionUpdaterApiState.SAVING)){
                 editionSaveIngoing.setVisibility(View.VISIBLE);
                 editionSaveCompleted.setVisibility(View.GONE);
@@ -62,7 +73,7 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
         }
     }
 
-    private void setDateTimeField(Poi poiToUpdate, TextView textView, Context context, DateFormat inputFormat, DateFormat outputFormat, String stringResource) {
+    private void setDateTimeField(Poi poiToUpdate, TextView textView, DateFormat inputFormat, DateFormat outputFormat, String stringResource) {
         int stringId = context.getResources().getIdentifier(stringResource, "string", context.getPackageName());
         try {
             Date date = inputFormat.parse(poiToUpdate.getCreatedAt());
@@ -73,7 +84,18 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
         }
     }
 
-    private void setupInformationPart(Poi poiToUpdate, View view, Context context){
+    @Override
+    public void setPicture(Bitmap picture){
+        ImageView imageView = view.findViewById(R.id.image_view);
+        if(picture != null) {
+            imageView.setImageBitmap(picture);
+            imageView.setVisibility(View.VISIBLE);
+        } else {
+            imageView.setVisibility(View.GONE);
+        }
+    }
+
+    private void setupInformationPart(Poi poiToUpdate){
         // Title
         TextView title = view.findViewById(R.id.title);
         int stringTitle = context.getResources().getIdentifier("weather_condition_updater_title", "string", context.getPackageName());
@@ -102,10 +124,10 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
         outputFormat.setTimeZone(TimeZone.getDefault());
 
         // Created at - date field
-        setDateTimeField(poiToUpdate, view.findViewById(R.id.created_at), context, inputFormat, outputFormat, "weather_condition_updater_created_at");
+        setDateTimeField(poiToUpdate, view.findViewById(R.id.created_at), inputFormat, outputFormat, "weather_condition_updater_created_at");
 
         // Updated at - date field
-        setDateTimeField(poiToUpdate, view.findViewById(R.id.last_update), context, inputFormat, outputFormat, "weather_condition_updater_last_update");
+        setDateTimeField(poiToUpdate, view.findViewById(R.id.last_update), inputFormat, outputFormat, "weather_condition_updater_last_update");
 
         // Added by
         TextView addedBy = view.findViewById(R.id.added_by);
@@ -124,7 +146,7 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
         view.findViewById(R.id.finished).setOnClickListener(v -> controller.userActionDeletePoi());
     }
 
-    private void setupDeletionPart(Poi poiToUpdate, View view, Context context){
+    private void setupDeletionPart(Poi poiToUpdate){
         TextView informationText = view.findViewById(R.id.click_if_is_finished);
         if(poiToUpdate.isFinished()){
             // Change information text
@@ -135,7 +157,7 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
         }
     }
 
-    private void setupEditionPart(Poi poiToUpdate, View view, Context context){
+    private void setupEditionPart(Poi poiToUpdate){
         if(poiToUpdate.isFinished()){
             // Hide edition_layout if the poi is finished
             view.findViewById(R.id.edition_layout).setVisibility(View.GONE);

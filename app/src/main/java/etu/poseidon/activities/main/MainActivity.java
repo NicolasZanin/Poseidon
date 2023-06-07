@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,7 +59,7 @@ import etu.poseidon.fragments.alert.EditAlert;
 import etu.poseidon.fragments.search.SearchFragment;
 import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
 import etu.poseidon.fragments.weathercondition.updater.WeatherConditionUpdaterFragment;
-import etu.poseidon.fragments.picture.IPictureActivity;
+import etu.poseidon.activities.main.tools.MainActivityPermissions;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
 import etu.poseidon.models.Account;
@@ -78,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements Observer,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
         ProfileHistoryAdapter.OnProfileLocateButtonClickedListener,
         SearchFragment.OnSearchFragmentListener,
-        IPictureActivity,
         EditAlert.OnConfirmEditAlertListener
 {
 
@@ -92,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements Observer,
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final String TAG_SEARCH_FRAGMENT = "POSEIDON" + "SEARCH";
     public static final int FAST_UPDATE_INTERVAL = 1;
-    public static final int PERMISSIONS_FINE_LOCATION = 99;
     private boolean followUser = true, isPositionOnMapSet = false, isUserMovingMap = false;
     private Bitmap picture;
     private ArrayList<WeatherCondition> weatherSelected = new ArrayList<>();
@@ -179,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "permission denied");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MainActivityPermissions.REQUEST_FINE_LOCATION);
             return;
         }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, null);
@@ -190,32 +187,48 @@ public class MainActivity extends AppCompatActivity implements Observer,
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(TAG, String.valueOf(permissions.length));
-        Log.d(TAG, "permission : " +permissions[0]);
         switch (requestCode) {
-            case PERMISSIONS_FINE_LOCATION:
-                Log.d(TAG, "grantResults : " +grantResults[0]);
+            case MainActivityPermissions.REQUEST_FINE_LOCATION:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "grantResults[0] = "+ PackageManager.PERMISSION_GRANTED);
                     startLocationUpdates();
-                    Log.d(TAG, "GPS UPDATED");
-
                 } else {
-                    Toast.makeText(this, "This app requires permission to be granted in order to work properly", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Need Permission");
+                    Toast.makeText(this, "Permission de localisation refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_LONG).show();
                 }
                 break;
-            case REQUEST_CAMERA:
+            case MainActivityPermissions.REQUEST_CAMERA:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast toast = Toast.makeText(this, "CAMERA Permission granted", Toast.LENGTH_SHORT);
-                    toast.show();
+                    Toast.makeText(this, "Permission d'utilisation de la caméra accordée", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast toast = Toast.makeText(this, "CAMERA Permission refused", Toast.LENGTH_SHORT);
-                    toast.show();
+                    Toast.makeText(this, "Permission d'utilisation de la caméra refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case MainActivityPermissions.REQUEST_MEDIA_WRITE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Permission d'écriture sur le stockage accordée", Toast.LENGTH_SHORT).show();
+                    if(fragmentManager.getOpenedFragment() instanceof WeatherConditionCreatorFragment){
+                        ((WeatherConditionCreatorFragment) fragmentManager.getOpenedFragment()).savePicture();
+                    }
+                } else {
+                    Toast.makeText(this, "Permission d'écriture sur le stockage refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_SHORT).show();
+                    if(fragmentManager.getOpenedFragment() instanceof WeatherConditionCreatorFragment){
+                        if(fragmentManager.getOpenedFragment() instanceof WeatherConditionCreatorFragment){
+                            ((WeatherConditionCreatorFragment) fragmentManager.getOpenedFragment()).closeFragmentWithUnsavedPicture();
+                        }
+                    }
+                }
+                break;
+            case MainActivityPermissions.REQUEST_MEDIA_READ:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Permission de lecture sur le stockage accordée", Toast.LENGTH_SHORT).show();
+                    if(fragmentManager.getOpenedFragment() instanceof WeatherConditionUpdaterFragment){
+                        ((WeatherConditionUpdaterFragment) fragmentManager.getOpenedFragment()).loadPicture();
+                    }
+                } else {
+                    Toast.makeText(this, "Permission de lecture sur le stockage refusée, vous ne pourrez pas utiliser notre application convenablement", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
-                Log.d(TAG, "Permission Refused");
+                Log.d(TAG, "Permission refusée");
                 break;
         }
 
@@ -228,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
             });
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MainActivityPermissions.REQUEST_FINE_LOCATION);
             }
         }
     }
@@ -326,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CAMERA) {
+        if (requestCode == MainActivityPermissions.REQUEST_CAMERA) {
             if (resultCode == RESULT_OK) {
                 picture = (Bitmap) data.getExtras().get("data");
                 PictureFragment pictureFragment = (PictureFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_picture);
