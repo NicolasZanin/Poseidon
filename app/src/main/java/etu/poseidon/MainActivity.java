@@ -6,12 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -32,6 +35,7 @@ import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements
     public static final int FAST_UPDATE_INTERVAL = 1;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int PERMISSIONS_COARSE_LOCATION = 98;
-    public boolean followUser = false;
+    private boolean followUser = true, isPositionOnMapSet = false, isUserMovingMap = false;
     private Bitmap picture;
     private ArrayList<WeatherCondition> weatherSelected = new ArrayList<>();
     private String searchText = "";
@@ -88,16 +92,15 @@ public class MainActivity extends AppCompatActivity implements
     FusedLocationProviderClient fusedLocationProviderClient;
     Location currentRealLocation;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Les configurations par défaut de l'appareil
-        Configuration.getInstance().load(getApplicationContext(),
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        Configuration.getInstance().load(getApplicationContext(),PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         setContentView(R.layout.activity_main);
-        // On récupère le layout de la map dans le activity_main.xml
-        map = findViewById(R.id.carte);
 
+        map = findViewById(R.id.carte);
         // Récupère la map en ligne
         map.setTileSource(TileSourceFactory.MAPNIK);
 
@@ -108,19 +111,24 @@ public class MainActivity extends AppCompatActivity implements
                 CustomZoomButtonsDisplay.HorizontalPosition.RIGHT,
                 CustomZoomButtonsDisplay.VerticalPosition.CENTER);
 
-        // Crée le point de départ de classe GeoPoint qu'on pourra personnalisé
-        // par la suite (avantage du geoPoint) et doit être utilisé par le gestionnaire de la map
-        GeoPoint startPoint = new GeoPoint(43.65020, 7.00517);
+        // Touch listener to set if the user screen is following his real GPS position or not (used when GPS updates to move the map)
+        map.setOnTouchListener((v, event) -> {
+            if(event.getAction() == MotionEvent.ACTION_DOWN){
+                isUserMovingMap = true;
+            }
+            if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                followUser = false;
+            }
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                isUserMovingMap = false;
+            }
+            return false;
+        });
 
         // On récupère le gestionnaire de la map pour poser des points, centrer la position, le zoom, etc.
         gestionnaireMap = map.getController();
 
-        // Pour centrer la map sur la coordonnées stating point (43.65020, 7.00517)
-        // au démarrage de l'application
-        gestionnaireMap.setCenter(startPoint);
-
-        // Pour mettre le niveau de zoom à 20.0
-        gestionnaireMap.setZoom(20.0);
+        // Setup location services
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000 * FAST_UPDATE_INTERVAL);
         locationRequest.setFastestInterval(1000 * FAST_UPDATE_INTERVAL);
@@ -134,10 +142,11 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
+        // Relocate button
         findViewById(R.id.button_relocate).setOnClickListener(click -> {
-            GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
-                    currentRealLocation.getLongitude());
+            GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(), currentRealLocation.getLongitude());
             gestionnaireMap.animateTo(geoPointActuel);
+            followUser = true;
         });
 
         // Lors du clique sur le bouton recherche, ajoute en arguments pour le fragment l'historique
@@ -151,33 +160,9 @@ public class MainActivity extends AppCompatActivity implements
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment, searchFragment).commit();
         });
 
-        findViewById(R.id.coMap).setOnClickListener(click -> {
-            Button button = findViewById(R.id.coMap);
-
-            // Créer le point où se situe l'utilisateur
-            if (markerCenter == null) {
-                GeoPoint geoPointActuel = new GeoPoint(currentRealLocation.getLatitude(),
-                        currentRealLocation.getLongitude());
-                markerCenter = PoiCreatorFactory.buildMarker(map, PoiCreatorFactory.PoiCondition.GLOBAL, geoPointActuel, this);
-                map.getOverlays().add(markerCenter);
-            }
-
-            if(followUser){
-                stopLocationUpdates();
-                followUser = false;
-                button.setText("Exploration de la carte");
-            } else {
-                startLocationUpdates();
-                followUser = true;
-                button.setText("La carte suit votre position");
-            }
-        });
-
-        updateGPS();
-    }
-
-    private void stopLocationUpdates() {
-        fusedLocationProviderClient.removeLocationUpdates(locationCallBack);
+        // Location updates
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        startLocationUpdates();
     }
 
     private void startLocationUpdates() {
@@ -226,19 +211,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateGPS(){
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Permission Granted");
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        Log.d(TAG, "Location is not null : " + location.getLatitude() + " " + location.getLongitude());
-                        updateCurrentLocation(location);
-                    } else {
-                        Log.d(TAG, "Location is null");
-                    }
-                }
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) updateCurrentLocation(location);
             });
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -248,24 +223,36 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateCurrentLocation(Location location) {
-        if (markerCenter != null)
-            markerCenter.setPosition(new GeoPoint(location));
         currentRealLocation = location;
+
+        // Update coordinates
         Button button = findViewById(R.id.coordinates);
         button.setText(currentRealLocation.getLatitude() + " " + currentRealLocation.getLongitude());
-        GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
-        gestionnaireMap.setCenter(newLocation);
-        gestionnaireMap.setZoom(20.0);
+
+        // Update blue dot marker
+        if (markerCenter != null)
+            markerCenter.setPosition(new GeoPoint(location));
+        else {
+            GeoPoint geoPointActuel = new GeoPoint(location);
+            markerCenter = PoiCreatorFactory.buildMarker(map, PoiCreatorFactory.PoiCondition.GLOBAL, geoPointActuel, this);
+            map.getOverlays().add(markerCenter);
+        }
+
+        // Update map
+        if(followUser && !isUserMovingMap) {
+            // isPositionOnMapSet is used to set the zoom and center of the map only when the app starts
+            if(isPositionOnMapSet) gestionnaireMap.animateTo(new GeoPoint(location.getLatitude(), location.getLongitude()));
+            else {
+                gestionnaireMap.setZoom(20.0);
+                gestionnaireMap.setCenter(new GeoPoint(location.getLatitude(), location.getLongitude()));
+                isPositionOnMapSet = true;
+            }
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        if(GoogleSignIn.getLastSignedInAccount(this) != null)
-            Log.d(TAG,"Logged account: " + GoogleSignIn.getLastSignedInAccount(this).getEmail());
-        else
-            Log.d(TAG,"No logged account");
 
         // Button to open weather condition creator
         Button buttonWeatherConditionCreator = findViewById(R.id.button_weather_condition_creator);
@@ -275,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements
         Button buttonProfile = findViewById(R.id.button_profile);
         buttonProfile.setOnClickListener(v -> openProfileFragment());
 
+        // Button to open alert
         Button buttonAlert = findViewById(R.id.button_alert_menu);
         buttonAlert.setOnClickListener(v -> openAlertFragment());
 
