@@ -54,6 +54,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="@id/alert_name"
         app:layout_constraintStart_toEndOf="@id/alert_name"
         app:layout_constraintTop_toTopOf="@id/alert_name" />
@@ -95,6 +96,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="@id/label_description"
         app:layout_constraintStart_toEndOf="@id/label_description"
         app:layout_constraintTop_toTopOf="@id/label_description" />
@@ -114,7 +116,7 @@
         android:id="@+id/range_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
         android:text="@string/weather_condition_creator_perimeter"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -139,7 +141,6 @@
         android:layout_marginStart="10dp"
         android:text="@string/weather_condition_creator_select_gps_position"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@id/radio_group_select_gps"
         app:layout_constraintStart_toStartOf="parent"

@@ -25,7 +25,7 @@
     <string name="weather_condition_creator_real_gps_position">Position GPS Réelle</string>
     <string name="weather_condition_creator_on_map_gps_position">Position sur la carte</string>
     <string name="weather_condition_creator_close_button">X</string>
-    <string name="weather_condition_creator_select_gps_position">Position GPS</string>
+    <string name="weather_condition_creator_select_gps_position">Position GPS :</string>
     <string name="weather_condition_creator_button_confirm">Confirmer</string>
     <string name="weather_condition_creator_button_cancel">Annuler</string>
     <string name="weather_condition_creator_select_weather_text">Sélectionner la condition météorologique de votre emplacement actuel</string>
@@ -104,5 +104,5 @@
     <string name="fragment_edit_alert_title_alert_name">Nom de l\'alerte :</string>
     <string name="fragment_edit_alert_title_to_alert">M\'alerter de :</string>
     <string name="fragment_edit_alert_title_description">Description :</string>
-    <string name="fragment_edit_alert_title_place">Lieu :</string>
+    <string name="fragment_edit_alert_title_place">Zone :</string>
 </resources>
