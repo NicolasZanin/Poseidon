@@ -17,6 +17,9 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -58,6 +61,7 @@ import etu.poseidon.fragments.weathercondition.updater.WeatherConditionUpdaterFr
 import etu.poseidon.fragments.picture.IPictureActivity;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
+import etu.poseidon.models.Account;
 import etu.poseidon.models.Alert;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
@@ -293,6 +297,9 @@ public class MainActivity extends AppCompatActivity implements Observer,
         buttonAlert.setOnClickListener(v -> fragmentManager.openAlertFragment());
 
         loadAllPOIs(false);
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account != null) Account.logIn(account);
     }
 
     @Override

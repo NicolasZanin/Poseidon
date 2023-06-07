@@ -30,6 +30,10 @@ public class Account {
         googleSignInAccount = account;
     }
 
+    public static void logIn(){
+        isLoggedIn = true;
+    }
+
     public static void logOut(GoogleSignInClient mGoogleSignInClient){
         if(googleSignInAccount != null) mGoogleSignInClient.signOut();
         isLoggedIn = false;

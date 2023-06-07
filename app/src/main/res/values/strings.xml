@@ -80,4 +80,10 @@
 
     <!-- Activity main item -->
     <string name="activity_main_coordonnees">%1$s, %2$s</string>
+
+    <!-- Fragment Login -->
+    <string name="fragment_login_demo_login_button">Compte Démo</string>
+    <string name="fragment_login_demo_account_title">Compte de démonstration</string>
+    <string name="fragment_login_google_login_title">Connectez-vous avec Google !</string>
+    <string name="fragment_login_close_button">X</string>
 </resources>
