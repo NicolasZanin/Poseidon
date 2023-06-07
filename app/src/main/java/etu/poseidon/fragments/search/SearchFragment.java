@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.fragments.search;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,6 +18,8 @@ import org.osmdroid.util.GeoPoint;
 import java.util.ArrayList;
 import java.util.List;
 
+import etu.poseidon.activities.main.MainActivity;
+import etu.poseidon.R;
 import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
 import etu.poseidon.models.weather.WeatherCondition;
 
@@ -38,6 +40,16 @@ public class SearchFragment extends Fragment implements WeatherConditionListSele
     private View rootView;
     private ArrayList<WeatherCondition> weatherSelected;
     private CharSequence searchText = "";
+
+    // Créer une nouvelle instance du fragment
+    public static SearchFragment newInstance(ArrayList<WeatherCondition> weatherSelected, CharSequence searchText) {
+        SearchFragment fragment = new SearchFragment();
+        Bundle args = new Bundle();
+        args.putParcelableArrayList(MainActivity.TAG_SEARCH_FRAGMENT, weatherSelected);
+        args.putCharSequence(MainActivity.TAG_SEARCH_FRAGMENT + "2", searchText);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstance) {

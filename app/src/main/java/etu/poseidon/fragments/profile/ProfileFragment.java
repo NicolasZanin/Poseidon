@@ -12,21 +12,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import etu.poseidon.fragments.profile.ProfileHistoryAdapter;
 import etu.poseidon.R;
+import etu.poseidon.models.Account;
 import etu.poseidon.models.Poi;
 import etu.poseidon.webservices.pois.PoiApiClient;
 import retrofit2.Call;
@@ -37,8 +35,8 @@ public class ProfileFragment extends Fragment {
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     private TextView numberOfEventsTextView, noEventsTextView;
-    GoogleSignInClient mGoogleSignInClient;
-    GoogleSignInAccount loggedInAccount;
+
+    private GoogleSignInClient mGoogleSignInClient;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -47,12 +45,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this.requireContext(), gso);
-        loggedInAccount = GoogleSignIn.getLastSignedInAccount(this.requireContext());
+        mGoogleSignInClient = GoogleSignIn.getClient(this.requireContext(), GoogleSignInOptions.DEFAULT_SIGN_IN);
     }
 
     @Override
@@ -74,14 +67,14 @@ public class ProfileFragment extends Fragment {
         });
 
         // Photo de profil - Récupération depuis Google ou récupération de l'image de profil de base depuis les ressources si inexistante chez Google
-        if(loggedInAccount.getPhotoUrl() == null) {
+        //if(loggedInAccount.getPhotoUrl() == null) {
             Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.profil, null);
             profileImage.setImageDrawable(drawable);
-        } else {
-            Picasso.get().load(loggedInAccount.getPhotoUrl()).into(profileImage);
-        }
+        //} else {
+        //    Picasso.get().load(loggedInAccount.getPhotoUrl()).into(profileImage);
+        //}
 
-        profileNameTextView.setText(loggedInAccount.getDisplayName());
+        profileNameTextView.setText(Account.getDisplayName());
         updateNumberOfEvents(0);
         loadHistory(view.findViewById(R.id.history));
 
@@ -95,37 +88,31 @@ public class ProfileFragment extends Fragment {
     }
 
     private void signOut() {
-        mGoogleSignInClient.signOut()
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
-                    Toast.makeText(requireContext(), "Déconnexion réussie, à bientôt !", Toast.LENGTH_SHORT).show();
-                    closeFragment();
-                }
-            });
+        Account.logOut(mGoogleSignInClient);
+        Toast.makeText(requireContext(), "Déconnexion réussie, à bientôt !", Toast.LENGTH_SHORT).show();
+        closeFragment();
     }
 
     private void loadHistory(ListView container) {
-        PoiApiClient.getInstance().getHistoryForUser(loggedInAccount.getEmail(), new Callback<List<Poi>>() {
+        PoiApiClient.getInstance().getHistoryForUser(Account.getEmail(), new Callback<>() {
             @Override
-            public void onResponse(Call<List<Poi>> call, Response<List<Poi>> response) {
+            public void onResponse(@NonNull Call<List<Poi>> call, @NonNull Response<List<Poi>> response) {
                 if (response.isSuccessful()) {
                     List<Poi> poiList = response.body();
                     // The player can have leave the fragment before we get the response, so we need to check if the context is still available and if not return
-                    if (getContext() == null) {
-                        return;
-                    }
+                    if (getContext() == null) return;
                     ProfileHistoryAdapter adapter = new ProfileHistoryAdapter(getContext(), poiList);
                     container.setAdapter(adapter);
 
+                    assert poiList != null;
                     updateNumberOfEvents(poiList.size());
                     toggleHistory(poiList.size());
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Poi>> call, Throwable t) {
-                Log.e(TAG,"Error: " + t.getMessage());
+            public void onFailure(@NonNull Call<List<Poi>> call, @NonNull Throwable t) {
+                Log.e(TAG, "Error: " + t.getMessage());
             }
         });
     }

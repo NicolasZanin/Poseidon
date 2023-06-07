@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.factories;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

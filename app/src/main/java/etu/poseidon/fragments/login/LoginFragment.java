@@ -1,6 +1,5 @@
-package etu.poseidon.fragments;
+package etu.poseidon.fragments.login;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -21,9 +20,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-import java.util.Objects;
-
 import etu.poseidon.R;
+import etu.poseidon.models.Account;
 
 public class LoginFragment extends Fragment {
 
@@ -91,6 +89,7 @@ public class LoginFragment extends Fragment {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            Account.logIn(account);
             Toast.makeText(requireContext(), "Connexion réussie, bienvenue !", Toast.LENGTH_SHORT).show();
             closeFragment();
         } catch (ApiException e) {

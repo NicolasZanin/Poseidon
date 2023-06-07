@@ -12,7 +12,7 @@
     android:layout_gravity="center"
     android:padding="10dp"
     android:background="@drawable/popup"
-    tools:context=".fragments.LoginFragment"
+    tools:context=".fragments.login.LoginFragment"
     >
 
     <TextView

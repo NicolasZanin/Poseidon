@@ -23,8 +23,8 @@ import etu.poseidon.models.Poi;
 
 public class ProfileHistoryAdapter extends BaseAdapter {
 
-    public interface OnLocateButtonClickedListener {
-        void onLocateButtonClicked(Poi poi);
+    public interface OnProfileLocateButtonClickedListener {
+        void onProfileLocateButtonClicked(Poi poi);
     }
 
     private List<Poi> items;
@@ -101,8 +101,8 @@ public class ProfileHistoryAdapter extends BaseAdapter {
 
         // Locate button
         layoutItem.findViewById(R.id.locate).setOnClickListener(v -> {
-            ProfileHistoryAdapter.OnLocateButtonClickedListener activity = (OnLocateButtonClickedListener) v.getContext();
-            activity.onLocateButtonClicked(item);
+            ProfileHistoryAdapter.OnProfileLocateButtonClickedListener activity = (OnProfileLocateButtonClickedListener) v.getContext();
+            activity.onProfileLocateButtonClicked(item);
         });
 
         Animation animation = AnimationUtils.loadAnimation(mInflater.getContext(), R.anim.slide_in_left);

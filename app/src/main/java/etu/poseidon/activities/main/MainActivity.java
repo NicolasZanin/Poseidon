@@ -1,4 +1,4 @@
-package etu.poseidon;
+package etu.poseidon.activities.main;
 
 
 import androidx.annotation.NonNull;
@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,13 +22,11 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import android.graphics.Bitmap;
@@ -37,7 +34,6 @@ import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
-import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -46,10 +42,12 @@ import org.osmdroid.views.CustomZoomButtonsDisplay;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-import etu.poseidon.fragments.LoginFragment;
-import etu.poseidon.fragments.alert.AlertsMenu;
+import etu.poseidon.activities.main.tools.FilterPoi;
+import etu.poseidon.activities.main.tools.MainActivityFragmentManager;
+import etu.poseidon.factories.PoiCreatorFactory;
+import etu.poseidon.R;
 import etu.poseidon.fragments.alert.EditAlert;
-import etu.poseidon.fragments.profile.ProfileFragment;
+import etu.poseidon.fragments.search.SearchFragment;
 import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
 import etu.poseidon.fragments.weathercondition.updater.WeatherConditionUpdaterFragment;
 import etu.poseidon.fragments.picture.IPictureActivity;
@@ -67,7 +65,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements
         WeatherConditionUpdaterFragment.OnWeatherConditionDeletedListener,
         WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener,
-        ProfileHistoryAdapter.OnLocateButtonClickedListener,
+        ProfileHistoryAdapter.OnProfileLocateButtonClickedListener,
         SearchFragment.OnSearchFragmentListener,
         IPictureActivity,
         EditAlert.OnConfirmEditAlertListener
@@ -75,14 +73,12 @@ public class MainActivity extends AppCompatActivity implements
     private MapView map;
     private IMapController gestionnaireMap;
 
-    private Fragment openedFragment;
+    private MainActivityFragmentManager fragmentManager;
 
     private final String TAG = "POSEIDON " + getClass().getSimpleName();
     public static final String TAG_SEARCH_FRAGMENT = "POSEIDON" + "SEARCH";
-    public static final int DEFAULT_UPDATE_INTERVAL = 30;
     public static final int FAST_UPDATE_INTERVAL = 1;
     public static final int PERMISSIONS_FINE_LOCATION = 99;
-    public static final int PERMISSIONS_COARSE_LOCATION = 98;
     private boolean followUser = true, isPositionOnMapSet = false, isUserMovingMap = false;
     private Bitmap picture;
     private ArrayList<WeatherCondition> weatherSelected = new ArrayList<>();
@@ -101,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements
         // Les configurations par défaut de l'appareil
         Configuration.getInstance().load(getApplicationContext(),PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         setContentView(R.layout.activity_main);
+
+        fragmentManager = new MainActivityFragmentManager(this);
 
         map = findViewById(R.id.carte);
         // Récupère la map en ligne
@@ -155,12 +153,7 @@ public class MainActivity extends AppCompatActivity implements
         // Lors du clique sur le bouton recherche, ajoute en arguments pour le fragment l'historique
         // du texte ainsi que les climats sélectionné
         findViewById(R.id.button_search).setOnClickListener( click -> {
-            SearchFragment searchFragment = new SearchFragment();
-            Bundle args = new Bundle();
-            args.putParcelableArrayList(TAG_SEARCH_FRAGMENT, weatherSelected);
-            args.putCharSequence(TAG_SEARCH_FRAGMENT + "2", searchText);
-            searchFragment.setArguments(args);
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment, searchFragment).commit();
+            fragmentManager.openSearchFragment(weatherSelected, searchText);
         });
 
         // Location updates
@@ -267,15 +260,15 @@ public class MainActivity extends AppCompatActivity implements
 
         // Button to open weather condition creator
         Button buttonWeatherConditionCreator = findViewById(R.id.button_weather_condition_creator);
-        buttonWeatherConditionCreator.setOnClickListener(v -> openWeatherConditionCreatorFragment());
+        buttonWeatherConditionCreator.setOnClickListener(v -> fragmentManager.openWeatherConditionCreatorFragment());
 
         // Button to open profile
         Button buttonProfile = findViewById(R.id.button_profile);
-        buttonProfile.setOnClickListener(v -> openProfileFragment());
+        buttonProfile.setOnClickListener(v -> fragmentManager.openProfileFragment());
 
         // Button to open alert
         Button buttonAlert = findViewById(R.id.button_alert_menu);
-        buttonAlert.setOnClickListener(v -> openAlertFragment());
+        buttonAlert.setOnClickListener(v -> fragmentManager.openAlertFragment());
 
         loadAllPOIs(false);
     }
@@ -312,15 +305,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void loadAllPOIs(boolean filter){
-        PoiApiClient.getInstance().getPoiList(new Callback<List<Poi>>() {
+        PoiApiClient.getInstance().getPoiList(new Callback<>() {
             @Override
-            public void onResponse(Call<List<Poi>> call, Response<List<Poi>> response) {
+            public void onResponse(@NonNull Call<List<Poi>> call, @NonNull Response<List<Poi>> response) {
                 if (response.isSuccessful()) {
                     List<Poi> poiList = response.body();
                     if (filter) {
                         FilterPoi filterPoi = new FilterPoi(poiList);
                         poiList = filterPoi.filtrePois(weatherSelected);
                     }
+                    assert poiList != null;
                     for (Poi poi : poiList) {
                         addPOI(poi);
                     }
@@ -328,8 +322,8 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             @Override
-            public void onFailure(Call<List<Poi>> call, Throwable t) {
-                Log.e(TAG,"Error: " + t.getMessage());
+            public void onFailure(@NonNull Call<List<Poi>> call, @NonNull Throwable t) {
+                Log.e(TAG, "Error: " + t.getMessage());
             }
         });
     }
@@ -339,19 +333,17 @@ public class MainActivity extends AppCompatActivity implements
      * @param poi Point of interest, le point à ajouter
      */
     private void addPOI(Poi poi) {
-        // On crée un GeoPoint qui contient une latitude et une longitude
         GeoPoint poiPosition = new GeoPoint(poi.getLatitude(), poi.getLongitude());
 
         Marker poiMarker = PoiCreatorFactory.buildMarker(map, PoiCreatorFactory.convertWeatherConditionPoiCondition(poi.getWeatherCondition()),
                 poiPosition, this);
 
-        // On récupère la liste des points de la map et on ajoute le point sur cette liste pour
-        // ajouter sur la map
+        // On récupère la liste des points de la map et on ajoute le point sur cette liste pour ajouter sur la map
         map.getOverlays().add(poiMarker);
 
         // On ajoute un événement quand on clique sur l'icone ajouté
         poiMarker.setOnMarkerClickListener((marker, mapView) -> {
-            openWeatherConditionUpdaterFragment(poi);
+            fragmentManager.openWeatherConditionUpdaterFragment(poi);
             return false;
         });
     }
@@ -363,70 +355,6 @@ public class MainActivity extends AppCompatActivity implements
         map.getOverlays().clear();
         map.invalidate();
 
-    }
-
-    private void openWeatherConditionUpdaterFragment(Poi poi){
-        closeOpenedFragment();
-        openedFragment = WeatherConditionUpdaterFragment.newInstance(poi);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, openedFragment).commit();
-    }
-
-    private void openWeatherConditionCreatorFragment(){
-        if(GoogleSignIn.getLastSignedInAccount(this) != null){
-            closeOpenedFragment();
-            openedFragment = WeatherConditionCreatorFragment.newInstance(currentRealLocation, new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude()));
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, openedFragment).commit();
-        } else {
-            openLoginFragment();
-        }
-    }
-
-    private void openProfileFragment(){
-        if(GoogleSignIn.getLastSignedInAccount(this) != null){
-            closeOpenedFragment();
-            ProfileFragment profileFragment = new ProfileFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, profileFragment).commit();
-            openedFragment = profileFragment;
-        } else {
-            openLoginFragment();
-        }
-    }
-
-    private void openAlertFragment(){
-        if(GoogleSignIn.getLastSignedInAccount(this) != null){
-            closeOpenedFragment();
-
-            AlertsMenu alertFragment = new AlertsMenu();
-
-            Bundle args = new Bundle();
-            // Real location
-            args.putParcelable("real_location_param", currentRealLocation);
-            alertFragment.setArguments(args);
-
-            // Map location
-            GeoPoint location = new GeoPoint(map.getMapCenter().getLatitude(), map.getMapCenter().getLongitude());
-            args.putParcelable("map_location_param", location);
-            alertFragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) alertFragment).commit();
-            openedFragment = alertFragment;
-        } else {
-            openLoginFragment();
-        }
-    }
-
-    private void openLoginFragment(){
-        closeOpenedFragment();
-        LoginFragment loginFragment = new LoginFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, loginFragment).commit();
-        openedFragment = loginFragment;
-    }
-
-    private void closeOpenedFragment() {
-        if (openedFragment != null) {
-            getSupportFragmentManager().beginTransaction().remove(openedFragment).commit();
-            openedFragment = null;
-        }
     }
 
     @Override
@@ -442,12 +370,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLocateButtonClicked(Poi poi) {
-        closeOpenedFragment();
+    public void onProfileLocateButtonClicked(Poi poi) {
+        fragmentManager.closeOpenedFragment();
         GeoPoint poiPosition = new GeoPoint(poi.getLatitude(), poi.getLongitude());
         gestionnaireMap.setCenter(poiPosition);
         gestionnaireMap.setZoom(20.0);
-        openWeatherConditionUpdaterFragment(poi);
+        fragmentManager.openWeatherConditionUpdaterFragment(poi);
     }
 
     // Centre la map avec le GeoPoint donner dans la barre de recherche
@@ -467,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onAlertCreated(String type, Alert alert) {
         Log.d("Alert", alert.toString());
         if(type.equals("create")){
-            AlertApiClient.getInstance().createAlert(alert, new Callback<Alert>() {
+            AlertApiClient.getInstance().createAlert(alert, new Callback<>() {
                 @Override
                 public void onResponse(Call<Alert> call, Response<Alert> response) {
                     if (response.isSuccessful()) {
@@ -500,5 +428,13 @@ public class MainActivity extends AppCompatActivity implements
                 }
             });
         }
+    }
+
+    public Location getCurrentRealLocation() {
+        return currentRealLocation;
+    }
+
+    public MapView getMap() {
+        return map;
     }
 }

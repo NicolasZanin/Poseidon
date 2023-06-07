@@ -30,6 +30,7 @@ import java.util.List;
 import etu.poseidon.R;
 import etu.poseidon.fragments.weathercondition.WeatherConditionCreatorFragment;
 import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
+import etu.poseidon.models.Account;
 import etu.poseidon.models.Alert;
 import etu.poseidon.models.weather.WeatherCondition;
 
@@ -154,10 +155,9 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
             }
         });
 
-        GoogleSignInAccount loggedInAccount = GoogleSignIn.getLastSignedInAccount(this.requireContext());
-        if (loggedInAccount != null) {
-            this.alert.setCreatorEmail(loggedInAccount.getEmail());
-            this.alert.setCreatorFullname(loggedInAccount.getDisplayName());
+        if (Account.isLoggedIn()) {
+            this.alert.setCreatorEmail(Account.getEmail());
+            this.alert.setCreatorFullname(Account.getDisplayName());
         }
 
         Button save = view.findViewById(R.id.confirm);

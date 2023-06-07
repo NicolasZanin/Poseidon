@@ -18,9 +18,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-
 import org.osmdroid.util.GeoPoint;
 
 import java.util.List;
@@ -28,6 +25,7 @@ import java.util.List;
 import etu.poseidon.R;
 import etu.poseidon.fragments.picture.PictureFragment;
 import etu.poseidon.fragments.weathercondition.components.WeatherConditionListSelectorFragment;
+import etu.poseidon.models.Account;
 import etu.poseidon.models.Poi;
 import etu.poseidon.models.weather.WeatherCondition;
 import etu.poseidon.webservices.pois.PoiApiClient;
@@ -49,7 +47,6 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
 
     private WeatherConditionCreatorFragment.OnWeatherConditionCreatedListener mListener;
 
-    private GoogleSignInAccount account;
     private Bitmap picture;
     private PictureFragment pictureFragment;
     private WeatherConditionListSelectorFragment weatherConditionListSelectorFragment;
@@ -77,8 +74,6 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
             currentRealLocation = getArguments().getParcelable(ARG_REAL_LOCATION);
             currentMapLocation = getArguments().getParcelable(ARG_MAP_LOCATION);
         }
-
-        account = GoogleSignIn.getLastSignedInAccount(getContext());
     }
 
     @Override
@@ -151,8 +146,8 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         }
         newPoi.setWeatherCondition(weatherConditionSelected);
         newPoi.setPerimeter(perimeter);
-        newPoi.setCreatorEmail(account.getEmail());
-        newPoi.setCreatorFullname(account.getDisplayName());
+        newPoi.setCreatorEmail(Account.getEmail());
+        newPoi.setCreatorFullname(Account.getDisplayName());
 
         PoiApiClient.getInstance().createPoi(newPoi, new Callback<Poi>() {
             @Override
