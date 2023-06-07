@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,8 +23,8 @@ import etu.poseidon.models.Poi;
 
 public class ProfileHistoryAdapter extends BaseAdapter {
 
-    public interface OnLocateButtonClickedListener {
-        void onLocateButtonClicked(Poi poi);
+    public interface OnProfileLocateButtonClickedListener {
+        void onProfileLocateButtonClicked(Poi poi);
     }
 
     private List<Poi> items;
@@ -99,9 +101,13 @@ public class ProfileHistoryAdapter extends BaseAdapter {
 
         // Locate button
         layoutItem.findViewById(R.id.locate).setOnClickListener(v -> {
-            ProfileHistoryAdapter.OnLocateButtonClickedListener activity = (OnLocateButtonClickedListener) v.getContext();
-            activity.onLocateButtonClicked(item);
+            ProfileHistoryAdapter.OnProfileLocateButtonClickedListener activity = (OnProfileLocateButtonClickedListener) v.getContext();
+            activity.onProfileLocateButtonClicked(item);
         });
+
+        Animation animation = AnimationUtils.loadAnimation(mInflater.getContext(), R.anim.slide_in_left);
+        animation.setDuration(300);
+        layoutItem.startAnimation(animation);
 
         return layoutItem;
     }

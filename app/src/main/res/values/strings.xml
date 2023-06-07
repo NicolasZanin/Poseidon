@@ -40,6 +40,8 @@
     <string name="weather_condition_updater_succefully_deleted_definitely">Condition météorologique supprimée définitivement de votre historique !</string>
     <string name="weather_condition_updater_button_information">Si l\'indication météorologique n\'est plus d\'actualité, cliquez sur le bouton \'Supprimer\' afin de la supprimer.</string>
     <string name="weather_condition_updater_button_information_already_finished">Cette indication météorologique est terminé, cliquez sur le bouton \'Supprimer\' afin de la supprimer définitivement de votre historique.</string>
+    <string name="weather_condition_updater_edition_title">Modification</string>
+    <string name="weather_condition_updater_edition_perimeter">Périmètre : %1$d milles marin</string>
 
     <!-- Picture fragment -->
     <string name="fragment_picture_take_picture">Prendre une photo</string>
@@ -61,6 +63,7 @@
     <string name="fragment_profile_history_columns_duration">Durée</string>
     <string name="fragment_profile_history_columns_locate">Localiser</string>
     <string name="fragment_profile_history_aucun_events_notifies">Aucun événement notifié…</string>
+    <string name="edit_text_recherche">Rechercher...</string>
 
     <!-- Profile history item -->
     <string name="profile_history_item_sample_date">08/05/2023</string>
@@ -71,4 +74,18 @@
     <string name="connection_google">Connectez-vous avec Google !</string>
     <string name="bouton_quitter">X</string>
 
+    <!-- Fragment History item -->
+    <string name="fragment_history_perimdapp">Périmètre appliqué :</string>
+    <string name="fragment_history_coordulieu">Coordonées du lieu :</string>
+    <string name="fragment_history_histordulieu">Historique du lieu</string>
+    <string name="fragment_history_hisoriclistlabel">Historique</string>
+
+    <!-- Activity main item -->
+    <string name="activity_main_coordonnees">%1$s, %2$s</string>
+
+    <!-- Fragment Login -->
+    <string name="fragment_login_demo_login_button">Compte Démo</string>
+    <string name="fragment_login_demo_account_title">Compte de démonstration</string>
+    <string name="fragment_login_google_login_title">Connectez-vous avec Google !</string>
+    <string name="fragment_login_close_button">X</string>
 </resources>

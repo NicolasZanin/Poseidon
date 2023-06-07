@@ -12,7 +12,7 @@
     android:layout_gravity="center"
     android:padding="10dp"
     android:background="@drawable/popup"
-    tools:context=".fragments.WeatherConditionUpdaterFragment"
+    tools:context=".fragments.weathercondition.updater.WeatherConditionUpdaterFragment"
     >
 
     <TextView
@@ -118,7 +118,7 @@
             android:id="@+id/edition_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Modification"
+            android:text="@string/weather_condition_updater_edition_title"
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginStart="10dp"
@@ -127,17 +127,87 @@
             app:layout_constraintStart_toStartOf="parent"
             />
 
-        <TextView
-            android:id="@+id/edition_soon"
+        <LinearLayout
+            android:id="@+id/edition_save_ingoing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bientôt..."
-            android:layout_marginTop="5dp"
-            android:textSize="14sp"
-            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toEndOf="@id/edition_title"
+            app:layout_constraintTop_toTopOf="@id/edition_title"
+            app:layout_constraintBottom_toBottomOf="@id/edition_title"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="gone"
+            >
+
+            <ProgressBar
+                android:layout_marginStart="5dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:indeterminateTint="@color/grey"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sauvegarde en cours..."
+                android:textSize="12sp"
+                android:textColor="@color/grey"
+                android:layout_marginStart="2dp"
+                />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/edition_save_completed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/edition_title"
+            app:layout_constraintTop_toTopOf="@id/edition_title"
+            app:layout_constraintBottom_toBottomOf="@id/edition_title"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="gone"
+            >
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="5dp"
+                android:src="@drawable/eo_circle_green_checkmark"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Données sauvegardées !"
+                android:textSize="12sp"
+                android:textColor="@color/green"
+                android:layout_marginStart="2dp"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/edition_range_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/weather_condition_updater_edition_perimeter"
+            android:textSize="16sp"
             android:textColor="@color/black"
             app:layout_constraintTop_toBottomOf="@id/edition_title"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="10dp"
+            />
+
+        <SeekBar
+            android:id="@+id/edition_range"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edition_range_value"
             />
 
 

@@ -18,6 +18,19 @@
         />
 
     <Button
+        android:id="@+id/button_alert_menu"
+        android:background="@drawable/round_button"
+        android:drawableTop="@drawable/ic_btn_indicate_weather"
+        android:drawableTint="@color/white"
+        android:textSize="0sp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <Button
         android:id="@+id/button_profile"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -41,19 +54,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- THIS IS TEMPORARY - ONLY FOR DEMONSTRATION -->
-    <!-- A SUPP ARNAUD -->
-    <Button
-        android:id="@+id/test_arnaud"
-        android:text="Test Arnaud"
-        android:textSize="16sp"
+    <TextView
+        android:id="@+id/coordinates"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/activity_main_coordinates"
+        android:text="@string/activity_main_coordonnees"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:padding="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:elevation="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_search"
+        android:background="@drawable/round_button"
+        android:textSize="0sp"
+        android:drawableTop="@drawable/ic_search"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="10dp"
+        android:drawableTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         />
-    <!-- END OF TEMPORARY -->
 
     <org.osmdroid.views.MapView
         android:id="@+id/carte"

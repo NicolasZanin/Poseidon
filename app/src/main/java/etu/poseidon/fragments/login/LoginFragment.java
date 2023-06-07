@@ -1,4 +1,4 @@
-package etu.poseidon.fragments;
+package etu.poseidon.fragments.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 
 
 import etu.poseidon.R;
+import etu.poseidon.models.Account;
 
 public class LoginFragment extends Fragment {
 
@@ -51,11 +52,12 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        view.findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
-            }
+        view.findViewById(R.id.sign_in_button).setOnClickListener(v -> signIn());
+
+        view.findViewById(R.id.demo_login_button).setOnClickListener(v -> {
+            Account.logIn();
+            Toast.makeText(requireContext(), "Connexion réussie, bienvenue !", Toast.LENGTH_SHORT).show();
+            closeFragment();
         });
 
         TextView closeButton = view.findViewById(R.id.close_button);
@@ -89,6 +91,7 @@ public class LoginFragment extends Fragment {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            Account.logIn(account);
             Toast.makeText(requireContext(), "Connexion réussie, bienvenue !", Toast.LENGTH_SHORT).show();
             closeFragment();
         } catch (ApiException e) {

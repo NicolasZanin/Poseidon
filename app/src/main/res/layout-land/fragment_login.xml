@@ -6,9 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="10dp"
-    android:background="@drawable/popup"
-    android:padding="10dp"
-    tools:context=".fragments.LoginFragment">
+    android:background="@drawable/popup">
 
     <TextView
         android:id="@+id/label_select_weather"
