@@ -6,6 +6,9 @@
     <!-- Global messages -->
     <string name="global_error">Une erreur est survenue. Veuillez réessayer.</string>
 
+    <!-- Global button text -->
+    <string name="close_button">X</string>
+
     <!-- Weather conditions -->
     <string name="weather_sun">Soleil</string>
     <string name="weather_cloud">Nuages</string>
@@ -13,6 +16,9 @@
     <string name="weather_wind">Vent</string>
     <string name="weather_storm">Tornade</string>
     <string name="weather_rain">Pluie</string>
+
+    <!--  Alert item example text  -->
+    <string name="alert_item_cap_antibes">Cap d\'Antibes</string>
 
     <!-- Weather condition creator texts -->
     <string name="weather_condition_creator_perimeter">Périmètre : %1$d milles marin</string>
