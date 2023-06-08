@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -93,12 +94,16 @@ public class SearchFragment extends Fragment implements WeatherConditionListSele
 
         // En cas de click sur le bouton de recherche
         rootView.findViewById(R.id.button_search_Fragment).setOnClickListener(click -> {
+            boolean fragmentIsClosable = true;
             // Récupère le texte de l'edit texte
             String text = editText.getText().toString();
 
             // Si le texte n'est pas vide
             if (text.length() != 0) {
-                String[] coordonnees = text.split(" ");
+                fragmentIsClosable = false;
+                String[] coordonnees;
+                if(text.contains(",")) coordonnees = text.split(",");
+                else coordonnees = text.split(" ");
 
                 // Récupère les données de longitude et latitude
                 if (coordonnees.length >= 2) {
@@ -108,20 +113,18 @@ public class SearchFragment extends Fragment implements WeatherConditionListSele
 
                         // Crée un Géopoint sur la position à chercher
                         GeoPoint newGeoPoint = new GeoPoint(longitude, latitude);
-                        searchFragmentListener.filterMap(weatherSelected, text);
                         searchFragmentListener.relocateSearch(newGeoPoint);
-                        closeFragment();
+                        fragmentIsClosable = true;
                     }
-                    // Crée une alerte en cas de mauvaise valeur entrée
-                    catch (NumberFormatException nFE) {
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-                        alertDialogBuilder.setTitle("Mauvaise valeur");
-                        alertDialogBuilder.setMessage("Vous avez pas mis de valeur");
-                        alertDialogBuilder.setNeutralButton("Ok", null);
-                        alertDialogBuilder.show();
+                    catch (NumberFormatException ignored) {
+                        Toast.makeText(getContext(), "Veuillez entrer des coordonnées valides", Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toast.makeText(getContext(), "Veuillez entrer des coordonnées valides", Toast.LENGTH_SHORT).show();
                 }
             }
+            if(weatherSelected != null && fragmentIsClosable) searchFragmentListener.filterMap(weatherSelected, text);
+            if(fragmentIsClosable) closeFragment();
         });
 
         return rootView;
@@ -154,8 +157,8 @@ public class SearchFragment extends Fragment implements WeatherConditionListSele
 
     // Ferme le fragment
     private void closeFragment(){
-        EditText editText = rootView.findViewById(R.id.edit_text_Search_Fragment);
-        editText.requestFocus();
+        //EditText editText = rootView.findViewById(R.id.edit_text_Search_Fragment);
+        //editText.requestFocus();
 
         // Ferme le clavier
         InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);

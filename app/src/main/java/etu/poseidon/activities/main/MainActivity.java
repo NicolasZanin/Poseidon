@@ -444,6 +444,8 @@ public class MainActivity extends AppCompatActivity implements Observer,
     // Centre la map avec le GeoPoint donner dans la barre de recherche
     @Override
     public void relocateSearch(GeoPoint geoPoint) {
+        followUser = false;
+        updateCoordinatesText(geoPoint.getLatitude(), geoPoint.getLongitude());
         gestionnaireMap.animateTo(geoPoint);
     }
 
