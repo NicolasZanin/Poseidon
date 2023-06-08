@@ -97,6 +97,7 @@ public class PictureFragment extends Fragment {
         // Remove the picture
         imageView.setVisibility(View.GONE);
         imageView.setImageBitmap(null);
+        mListener.onPictureTaken(null);
     }
 
     public void setOnPictureTakenListener(PictureFragment.OnPictureTakenListener listener) {
