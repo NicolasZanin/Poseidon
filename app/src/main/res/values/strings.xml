@@ -69,7 +69,6 @@
     <string name="fragment_profile_history_columns_duration">Durée</string>
     <string name="fragment_profile_history_columns_locate">Localiser</string>
     <string name="fragment_profile_history_aucun_events_notifies">Aucun événement notifié…</string>
-    <string name="edit_text_recherche">Rechercher…</string>
 
     <!-- Profile history item -->
     <string name="profile_history_item_sample_date">08/05/2023</string>
@@ -106,4 +105,9 @@
     <string name="fragment_edit_alert_title_to_alert">M\'alerter de :</string>
     <string name="fragment_edit_alert_title_description">Description :</string>
     <string name="fragment_edit_alert_title_place">Zone :</string>
+
+    <!-- Fragment recherche text -->
+    <string name="fragement_recherche_rechercher">Rechercher…</string>
+    <string name="fragement_recherche_filtrer">Filtrer</string>
+
 </resources>
