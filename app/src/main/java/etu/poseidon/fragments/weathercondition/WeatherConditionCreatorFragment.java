@@ -62,7 +62,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
 
     private Bitmap picture;
     private Poi newPoi;
-    private WeatherCondition weatherConditionSelected;
+    private WeatherCondition weatherConditionSelected = WeatherCondition.SUN;
 
     private RadioButton realLocationButton;
 
@@ -134,8 +134,8 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         transaction.addToBackStack(null);
         transaction.commit();
 
-        // Weather condition list
-        WeatherConditionListSelectorFragment weatherConditionListSelectorFragment = WeatherConditionListSelectorFragment.newInstance(false, List.of(WeatherCondition.SUN));
+        // Weather condition list (by default its SUN)
+        WeatherConditionListSelectorFragment weatherConditionListSelectorFragment = WeatherConditionListSelectorFragment.newInstance(false, List.of(weatherConditionSelected));
         weatherConditionListSelectorFragment.setOnWeatherConditionListSelectedListener(this);
         requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_weather_condition_list, weatherConditionListSelectorFragment).commit();
 
