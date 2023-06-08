@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        android:contentDescription="@string/image_meteo" />
 
     <LinearLayout
         android:id="@+id/state_layout"
@@ -30,12 +30,11 @@
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
-            android:layout_marginLeft="1dp"
+            android:layout_marginStart="1dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textColor="@color/black"
-            tools:text="@string/profile_history_item_sample_date" />
-
+            android:text="@string/profile_history_item_sample_date" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
