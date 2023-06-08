@@ -15,7 +15,7 @@ public class NotifyApp extends Application {
         super.onCreate();
         Log.d("NotifyApp", "onCreate");
 
-        String channelName = "my channel name";
+        String channelName = "weather_alert";
 
         NotificationChannel channel = null;
 

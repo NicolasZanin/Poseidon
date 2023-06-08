@@ -1,6 +1,8 @@
 package etu.poseidon.fragments.alert;
 
 import android.content.Context;
+import android.location.Location;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+
+import org.osmdroid.util.GeoPoint;
 
 import java.util.List;
 
@@ -25,9 +29,14 @@ public class AlertAdapter extends BaseAdapter {
 
     private List<Alert> items;
     private LayoutInflater mInflater;
-    public AlertAdapter(Context applicationContext, List<Alert> items) {
+    private Location currentRealLocation;
+    private GeoPoint currentMapLocation;
+    public AlertAdapter(Context applicationContext, List<Alert> items, Location currentRealLocation, GeoPoint currentMapLocation){
         this.items = items;
-        mInflater = (LayoutInflater.from(applicationContext));
+        this.mInflater = (LayoutInflater.from(applicationContext));
+        this.currentRealLocation = currentRealLocation;
+        this.currentMapLocation = currentMapLocation;
+
     }
 
 
@@ -43,7 +52,7 @@ public class AlertAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int i) {
-        return Long.parseLong(items.get(i).getId());
+        return Long.parseLong("0");
     }
 
     @Override
@@ -83,6 +92,14 @@ public class AlertAdapter extends BaseAdapter {
         layoutItem.setOnClickListener(v -> {
             // TODO : add location in args and pass it to the fragment
             EditAlert detailsFragment = new EditAlert(item);
+            Bundle args = new Bundle();
+            // Real location
+            args.putParcelable("real_location_param", currentRealLocation);
+            detailsFragment.setArguments(args);
+
+            // Map location
+            args.putParcelable("map_location_param", currentMapLocation);
+            detailsFragment.setArguments(args);
             FragmentManager fragmentManager = ((AppCompatActivity) viewGroup.getContext()).getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.fragment, detailsFragment)
@@ -92,7 +109,6 @@ public class AlertAdapter extends BaseAdapter {
 
         TextView deleteAlertTextView = layoutItem.findViewById(R.id.delete_alert);
         deleteAlertTextView.setOnClickListener(v -> {
-            // TODO : delete alert from database
             AlertApiClient.getInstance().deleteAlert(item.getId(), new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
