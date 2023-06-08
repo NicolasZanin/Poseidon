@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:maxWidth="700dp"
     android:layout_height="match_parent"
     android:layout_margin="10dp"
     android:background="@drawable/popup"
@@ -23,9 +24,10 @@
 
     <ListView
         android:id="@+id/alerts_list"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/alerts_menu_title"
         android:divider="@color/black"
         android:dividerHeight="1dp"

@@ -2,13 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/edit_alert_fragment_layout"
     android:layout_width="match_parent"
+    android:maxWidth="700dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="10dp"
     android:background="@drawable/popup"
     android:paddingBottom="10dp"
-    android:id="@+id/edit_alert_fragment_layout"
     tools:context=".fragments.alert.EditAlert">
 
 
@@ -129,8 +130,8 @@
         android:id="@+id/range"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:progress="10"
         android:layout_marginEnd="10dp"
+        android:progress="10"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/fragment_weather_condition_list"
         app:layout_constraintTop_toBottomOf="@id/range_value" />
