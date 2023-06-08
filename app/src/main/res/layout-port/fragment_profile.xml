@@ -60,10 +60,11 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/black"
         android:textSize="20sp"
+        android:text="@string/fragment_profile_name_example"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imgProfil"
-        tools:text="@string/fragment_profile_name_example" />
+        />
 
     <!-- Texte avec nombre et "événements notifiés" -->
     <TextView
@@ -75,9 +76,10 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/black"
         android:textSize="16sp"
+        android:text="@string/fragment_profile_nb_events_notifies"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtNomProfil"
-        tools:text="@string/fragment_profile_nb_events_notifies" />
+        />
 
     <!-- Bannière "HISTORIQUE" -->
     <TextView
