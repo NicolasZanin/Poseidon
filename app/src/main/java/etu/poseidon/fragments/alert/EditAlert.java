@@ -120,6 +120,9 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
         // Avoid user miscliking on the activity holding when fragment open
         view.findViewById(R.id.edit_alert_fragment_layout).setOnClickListener(v -> {});
 
+        TextView rangeValue = view.findViewById(R.id.range_value);
+        rangeValue.setText("Périmètre : " + String.valueOf((int)this.alert.getPerimeter()) + " milles marin");
+
         TextView title = view.findViewById(R.id.edit_alert_title);
         if(this.type.equals("create")){
             title.setText("Créer une alerte");
