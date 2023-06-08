@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -33,35 +34,39 @@ public class IHMFirebaseMessagingService extends FirebaseMessagingService {
 
             String weather = Message.getInstance().getWeather();
             Drawable drawable;
-            switch(weather){
-                case "SUN":
-                    drawable = getResources().getDrawable(R.drawable.ic_weather_sun);
-                    break;
-                case "RAIN":
-                    drawable = getResources().getDrawable(R.drawable.ic_weather_rain);
-                    break;
-                case "THUNDERSTORM":
-                    drawable = getResources().getDrawable(R.drawable.ic_weather_thunderstorm);
-                    break;
-                case "WIND":
-                    drawable = getResources().getDrawable(R.drawable.ic_weather_wind);
-                    break;
-                case "CLOUD":
-                    drawable = getResources().getDrawable(R.drawable.ic_weather_cloud);
-                    break;
-                case "STORM":
-                    drawable = getResources().getDrawable(R.drawable.ic_weather_storm);
-                    break;
-                default:
-                    drawable = getResources().getDrawable(R.drawable.ic_btn_alert);
-                    break;
+            if(weather != null) {
+                switch (weather) {
+                    case "SUN":
+                        drawable = getResources().getDrawable(R.drawable.ic_weather_sun);
+                        break;
+                    case "RAIN":
+                        drawable = getResources().getDrawable(R.drawable.ic_weather_rain);
+                        break;
+                    case "THUNDERSTORM":
+                        drawable = getResources().getDrawable(R.drawable.ic_weather_thunderstorm);
+                        break;
+                    case "WIND":
+                        drawable = getResources().getDrawable(R.drawable.ic_weather_wind);
+                        break;
+                    case "CLOUD":
+                        drawable = getResources().getDrawable(R.drawable.ic_weather_cloud);
+                        break;
+                    case "STORM":
+                        drawable = getResources().getDrawable(R.drawable.ic_weather_storm);
+                        break;
+                    default:
+                        drawable = getResources().getDrawable(R.drawable.ic_btn_alert);
+                        break;
+                }
             }
+
+            Log.d("NOTIFICATION PERCUE", "onMessageReceived: " + Message.getInstance().getTitle() + " " + Message.getInstance().getBody() );
 
             NotificationCompat.Builder notif = new NotificationCompat.Builder(getApplicationContext(), NotifyApp.CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_launcher_background)
                     .setContentTitle(Message.getInstance().getTitle())
                     .setContentText(Message.getInstance().getBody())
-                    .setLargeIcon(drawableToBitmap(drawable))
+                    //.setLargeIcon(drawableToBitmap(drawable))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
