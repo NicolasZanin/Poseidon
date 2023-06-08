@@ -36,7 +36,7 @@
     <string name="weather_condition_updater_title">Indication météorologique%1$s</string>
     <string name="weather_condition_updater_coordinates">Coordonnées : %1$f, %2$f</string>
     <string name="weather_condition_updater_current_condition">Condition actuelle : %1$s</string>
-    <string name="weather_condition_updater_perimeter">Périmètre : %1$d miles marin</string>
+    <string name="weather_condition_updater_perimeter">Périmètre : %1$d milles marin</string>
     <string name="weather_condition_updater_created_at">Créé le : %1$s</string>
     <string name="weather_condition_updater_last_update">Dernière mise à jour : %1$s</string>
     <string name="weather_condition_updater_added_by">Ajouté par : %1$s</string>
@@ -48,6 +48,9 @@
     <string name="weather_condition_updater_button_information_already_finished">Cette indication météorologique est terminé, cliquez sur le bouton \'Supprimer\' afin de la supprimer définitivement de votre historique.</string>
     <string name="weather_condition_updater_edition_title">Modification</string>
     <string name="weather_condition_updater_edition_perimeter">Périmètre : %1$d milles marin</string>
+    <string name="weather_condition_updater_logging">Sauvegarde en cours…</string>
+    <string name="weather_condition_updater_data_logged">Données sauvegardées !</string>
+    <string name="weather_condition_updater_deleting">Suppression</string>
 
     <!-- Picture fragment -->
     <string name="fragment_picture_take_picture">Prendre une photo</string>
