@@ -192,6 +192,23 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
             closeFragment(); // TODO: open alertMenuFragment if created or edited successfully
         });
 
+        Button cancel = view.findViewById(R.id.cancel);
+        cancel.setOnClickListener(v -> {
+            // open alertMenuFragment
+            closeFragment();
+            // TODO :add location
+            AlertsMenu alertsMenuFragment = new AlertsMenu();
+            Bundle args = new Bundle();
+            // Real location
+            args.putParcelable("real_location_param", currentRealLocation);
+            alertsMenuFragment.setArguments(args);
+
+            // Map location
+            args.putParcelable("map_location_param", currentMapLocation);
+            alertsMenuFragment.setArguments(args);
+            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment, alertsMenuFragment).commit();
+        });
+
 
 
         // Inflate the layout for this fragment
