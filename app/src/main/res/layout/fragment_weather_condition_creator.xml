@@ -13,6 +13,7 @@
     android:padding="10dp"
     android:background="@drawable/popup"
     tools:context=".fragments.weathercondition.WeatherConditionCreatorFragment"
+    android:id="@+id/weather_condition_creator_fragment_layout"
     >
 
     <TextView
