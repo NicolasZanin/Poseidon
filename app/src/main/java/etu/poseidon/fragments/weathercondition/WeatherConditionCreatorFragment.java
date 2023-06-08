@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -65,6 +66,8 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
     private WeatherCondition weatherConditionSelected = WeatherCondition.SUN;
 
     private RadioButton realLocationButton;
+
+    private ProgressBar loading;
 
     public WeatherConditionCreatorFragment() {
         // Required empty public constructor
@@ -126,7 +129,7 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
         TextView closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(v -> closeFragment());
 
-        // Picture fragment
+        // Picture fragment (we can't set this fragment as static because we need to set the listener manually, as we already are in fragment)
         PictureFragment pictureFragment = new PictureFragment();
         pictureFragment.setOnPictureTakenListener(this);
         FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
@@ -141,56 +144,61 @@ public class WeatherConditionCreatorFragment extends Fragment implements Weather
 
         realLocationButton = view.findViewById(R.id.radio_gps);
 
+        loading = view.findViewById(R.id.loading);
+
         // Inflate the layout for this fragment
         return view;
     }
 
     private void handleConfirmButton(){
-        newPoi = new Poi();
-        if(realLocationButton.isChecked()) {
-            if(currentRealLocation == null) {
-                int stringError = getResources().getIdentifier("weather_condition_creator_no_gps", "string", requireContext().getPackageName());
-                Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_LONG).show();
-                closeFragment();
-                return;
+        if(loading.getVisibility() != View.VISIBLE) {
+            loading.setVisibility(View.VISIBLE);
+            newPoi = new Poi();
+            if (realLocationButton.isChecked()) {
+                if (currentRealLocation == null) {
+                    int stringError = getResources().getIdentifier("weather_condition_creator_no_gps", "string", requireContext().getPackageName());
+                    Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_LONG).show();
+                    closeFragment();
+                    return;
+                }
+                newPoi.setLatitude(currentRealLocation.getLatitude());
+                newPoi.setLongitude(currentRealLocation.getLongitude());
+            } else {
+                newPoi.setLatitude(currentMapLocation.getLatitude());
+                newPoi.setLongitude(currentMapLocation.getLongitude());
             }
-            newPoi.setLatitude(currentRealLocation.getLatitude());
-            newPoi.setLongitude(currentRealLocation.getLongitude());
-        } else {
-            newPoi.setLatitude(currentMapLocation.getLatitude());
-            newPoi.setLongitude(currentMapLocation.getLongitude());
-        }
-        newPoi.setWeatherCondition(weatherConditionSelected);
-        newPoi.setPerimeter(perimeter);
-        newPoi.setCreatorEmail(Account.getEmail());
-        newPoi.setCreatorFullname(Account.getDisplayName());
+            newPoi.setWeatherCondition(weatherConditionSelected);
+            newPoi.setPerimeter(perimeter);
+            newPoi.setCreatorEmail(Account.getEmail());
+            newPoi.setCreatorFullname(Account.getDisplayName());
 
-        PoiApiClient.getInstance().createPoi(newPoi, new Callback<Poi>() {
-            @Override
-            public void onResponse(@NonNull Call<Poi> call, @NonNull Response<Poi> response) {
-                if (response.isSuccessful()) {
-                    newPoi = response.body();
-                    int stringSuccess = getResources().getIdentifier("weather_condition_creator_weather_sent", "string", requireContext().getPackageName());
-                    Toast.makeText(getContext(), getString(stringSuccess), Toast.LENGTH_SHORT).show();
-                    mListener.onWeatherConditionCreated(newPoi);
-                    if(picture != null) savePicture();
-                    else closeFragment();
-                } else {
+            PoiApiClient.getInstance().createPoi(newPoi, new Callback<Poi>() {
+                @Override
+                public void onResponse(@NonNull Call<Poi> call, @NonNull Response<Poi> response) {
+                    if (response.isSuccessful()) {
+                        newPoi = response.body();
+                        int stringSuccess = getResources().getIdentifier("weather_condition_creator_weather_sent", "string", requireContext().getPackageName());
+                        Toast.makeText(getContext(), getString(stringSuccess), Toast.LENGTH_SHORT).show();
+                        mListener.onWeatherConditionCreated(newPoi);
+                        if (picture != null) savePicture();
+                        else closeFragment();
+                    } else {
+                        int stringError = getResources().getIdentifier("global_error", "string", requireContext().getPackageName());
+                        Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
+                        Log.e("POSEIDON", "Error: " + response.code() + " " + response.message());
+                        closeFragment();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Poi> call, @NonNull Throwable t) {
                     int stringError = getResources().getIdentifier("global_error", "string", requireContext().getPackageName());
                     Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
-                    Log.e("POSEIDON", "Error: " + response.code() + " " + response.message());
+                    Log.e("POSEIDON", "Error: " + t.getMessage());
                     closeFragment();
                 }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Poi> call, @NonNull Throwable t) {
-                int stringError = getResources().getIdentifier("global_error", "string", requireContext().getPackageName());
-                Toast.makeText(getContext(), getString(stringError), Toast.LENGTH_SHORT).show();
-                Log.e("POSEIDON", "Error: " + t.getMessage());
-                closeFragment();
-            }
-        });
+            });
+        }
     }
 
     private void closeFragment(){

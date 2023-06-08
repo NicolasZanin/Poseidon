@@ -30,7 +30,7 @@ public class WeatherConditionUpdaterFragment extends Fragment {
      * - La View :
      *      - Gère les éléments graphiques et les listeners
      * - Le Controller :
-     *      - Gère la communication de la View au le Model
+     *      - Gère la communication entre la View et le Model
      */
 
     private WeatherConditionUpdaterController controller;

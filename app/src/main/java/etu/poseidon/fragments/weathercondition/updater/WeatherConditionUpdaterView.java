@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -142,7 +143,13 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
         view.findViewById(R.id.close).setOnClickListener(v -> controller.userActionCloseFragment());
 
         // Finished button
-        view.findViewById(R.id.finished).setOnClickListener(v -> controller.userActionDeletePoi());
+        view.findViewById(R.id.finished).setOnClickListener(v -> {
+            ProgressBar loading = view.findViewById(R.id.loading);
+            if(loading.getVisibility() != View.VISIBLE){
+                loading.setVisibility(View.VISIBLE);
+                controller.userActionDeletePoi();
+            }
+        });
     }
 
     private void setupDeletionPart(Poi poiToUpdate){
