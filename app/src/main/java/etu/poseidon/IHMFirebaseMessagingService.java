@@ -34,31 +34,31 @@ public class IHMFirebaseMessagingService extends FirebaseMessagingService {
 
             String weather = Message.getInstance().getWeather();
             Drawable drawable;
-            if(weather != null) {
-                switch (weather) {
-                    case "SUN":
-                        drawable = getResources().getDrawable(R.drawable.ic_weather_sun);
-                        break;
-                    case "RAIN":
-                        drawable = getResources().getDrawable(R.drawable.ic_weather_rain);
-                        break;
-                    case "THUNDERSTORM":
-                        drawable = getResources().getDrawable(R.drawable.ic_weather_thunderstorm);
-                        break;
-                    case "WIND":
-                        drawable = getResources().getDrawable(R.drawable.ic_weather_wind);
-                        break;
-                    case "CLOUD":
-                        drawable = getResources().getDrawable(R.drawable.ic_weather_cloud);
-                        break;
-                    case "STORM":
-                        drawable = getResources().getDrawable(R.drawable.ic_weather_storm);
-                        break;
-                    default:
-                        drawable = getResources().getDrawable(R.drawable.ic_btn_alert);
-                        break;
-                }
+            switch (weather) {
+                case "SUN":
+                    drawable = getResources().getDrawable(R.drawable.ic_weather_sun);
+                    break;
+                case "RAIN":
+                    drawable = getResources().getDrawable(R.drawable.ic_weather_rain);
+                    break;
+                case "THUNDERSTORM":
+                    drawable = getResources().getDrawable(R.drawable.ic_weather_thunderstorm);
+                    break;
+                case "WIND":
+                    drawable = getResources().getDrawable(R.drawable.ic_weather_wind);
+                    break;
+                case "CLOUD":
+                    drawable = getResources().getDrawable(R.drawable.ic_weather_cloud);
+                    break;
+                case "STORM":
+                    drawable = getResources().getDrawable(R.drawable.ic_weather_storm);
+                    break;
+                default:
+                    drawable = getResources().getDrawable(R.drawable.ic_btn_alert);
+                    break;
             }
+
+            Drawable logo = getResources().getDrawable(R.mipmap.ic_launcher);
 
             Log.d("NOTIFICATION PERCUE", "onMessageReceived: " + Message.getInstance().getTitle() + " " + Message.getInstance().getBody() );
 
@@ -66,7 +66,8 @@ public class IHMFirebaseMessagingService extends FirebaseMessagingService {
                     .setSmallIcon(R.drawable.ic_launcher_background)
                     .setContentTitle(Message.getInstance().getTitle())
                     .setContentText(Message.getInstance().getBody())
-                    //.setLargeIcon(drawableToBitmap(drawable))
+                    .setLargeIcon(drawableToBitmap(logo, 100, 0))
+                    .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(drawableToBitmap(drawable, 200, 200)))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -74,20 +75,35 @@ public class IHMFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    public static Bitmap drawableToBitmap(Drawable drawable) {
+    public static Bitmap drawableToBitmap(Drawable drawable, int imageSize, int marginSize) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
         }
 
         int width = drawable.getIntrinsicWidth();
         int height = drawable.getIntrinsicHeight();
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        float scale = Math.max((float) imageSize / width, (float) imageSize / height);
+
+        int scaledWidth = Math.round(scale * width);
+        int scaledHeight = Math.round(scale * height);
+
+        int bitmapSize = imageSize + 2 * marginSize; // Taille du Bitmap avec la marge
+
+        Bitmap bitmap = Bitmap.createBitmap(bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        int left = (bitmapSize - scaledWidth) / 2;
+        int top = (bitmapSize - scaledHeight) / 2;
+        int right = left + scaledWidth;
+        int bottom = top + scaledHeight;
+
+        drawable.setBounds(left, top, right, bottom);
         drawable.draw(canvas);
 
         return bitmap;
     }
+
+
 
 }
 
