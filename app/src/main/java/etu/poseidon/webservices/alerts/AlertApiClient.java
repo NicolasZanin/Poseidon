@@ -27,26 +27,8 @@ public class AlertApiClient {
     private AlertApiService alertApiService;
 
     private AlertApiClient() {
-        // Temporaire pour afficher le JSON brut dans le logcat
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.addInterceptor(new Interceptor() {
-            @Override
-            public Response intercept(Chain chain) throws IOException {
-                Request request = chain.request();
-                Response response = chain.proceed(request);
-                String rawJson = response.body().string();
-                //Log.d("Raw JSON Alert", rawJson); // afficher le JSON brut dans le logcat
-                return response.newBuilder()
-                        .body(ResponseBody.create(response.body().contentType(), rawJson))
-                        .build();
-            }
-        });
-        OkHttpClient okHttpClient = builder.build();
-        // Fin temporaire
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .client(okHttpClient) // temporaire
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
                         .registerTypeAdapter(WeatherCondition.class, new WeatherConditionAdapter())
                         .create()))
