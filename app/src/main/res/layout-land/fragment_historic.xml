@@ -23,7 +23,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/black"
         android:textSize="24sp"
-        app:layout_constraintEnd_toStartOf="@+id/close_button"
+        app:layout_constraintEnd_toStartOf="@id/close_button"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -76,18 +76,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label_perim" />
 
-    <!--<TextView
-        android:id="@+id/label_historicList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/fragment_history_hisoriclistlabel"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/history_list"
-        app:layout_constraintTop_toBottomOf="@id/label_historic" />-->
-
     <ListView
         android:id="@+id/history_list"
         android:layout_width="0dp"
@@ -97,7 +85,7 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/range"
+        app:layout_constraintStart_toEndOf="@id/range"
         app:layout_constraintTop_toBottomOf="@id/label_historic"
         tools:listitem="@layout/history_item" />
 
