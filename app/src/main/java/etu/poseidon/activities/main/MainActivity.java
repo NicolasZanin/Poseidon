@@ -158,8 +158,6 @@ public class MainActivity extends AppCompatActivity implements Observer,
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         startLocationUpdates();
 
-        updateGPS();
-
         Message.getInstance().addObserver(this);
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
@@ -310,10 +308,11 @@ public class MainActivity extends AppCompatActivity implements Observer,
             fragmentManager.openSearchFragment(weatherSelected, searchText);
         });
 
-        // Button to reload all the POIs on the map
+        // Button to reload all
         findViewById(R.id.button_refresh).setOnClickListener(click -> {
             removeAllPOIs();
             loadAllPOIs(true);
+            updateGPS();
         });
 
         // Get the last signed in account
