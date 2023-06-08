@@ -107,10 +107,9 @@ public class WeatherConditionUpdaterView implements Observer, IWeatherConditionU
         coordinates.setText(context.getString(stringCoordinates, poiToUpdate.getLatitude(), poiToUpdate.getLongitude()));
 
         // Weather condition
-        TextView weatherCondition = view.findViewById(R.id.condition);
-        int stringCurrentWeatherCondition = context.getResources().getIdentifier("weather_condition_updater_current_condition", "string", context.getPackageName());
+        TextView weatherCondition = view.findViewById(R.id.condition_valeur);
         int stringWeatherCondition = context.getResources().getIdentifier("weather_" + poiToUpdate.getWeatherCondition().toString().toLowerCase(Locale.ROOT), "string", context.getPackageName());
-        weatherCondition.setText(context.getString(stringCurrentWeatherCondition, context.getString(stringWeatherCondition)));
+        weatherCondition.setText(context.getString(stringWeatherCondition));
 
         // Perimeter
         TextView perimeter = view.findViewById(R.id.perimeter);
