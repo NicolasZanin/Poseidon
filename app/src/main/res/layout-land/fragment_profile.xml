@@ -44,11 +44,12 @@
         android:id="@+id/imgProfil"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/profil"
-        app:layout_constraintTop_toBottomOf="@id/btnDeconnexion"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/txtHistorique"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <!-- Nom du profil -->
@@ -56,14 +57,15 @@
         android:id="@+id/txtNomProfil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/fragment_profile_name_example"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/black"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/imgProfil"
+        app:layout_constraintEnd_toEndOf="@id/imgProfil"
         app:layout_constraintTop_toBottomOf="@id/imgProfil"
-        tools:text="@string/fragment_profile_name_example" />
+        />
 
     <!-- Texte avec nombre et "événements notifiés" -->
     <TextView
@@ -75,33 +77,49 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/black"
         android:textSize="16sp"
+        android:text="@string/fragment_profile_nb_events_notifies"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtNomProfil"
-        tools:text="@string/fragment_profile_nb_events_notifies" />
+        app:layout_constraintTop_toBottomOf="@id/btnDeconnexion"
+        />
 
     <!-- Bannière "HISTORIQUE" -->
     <TextView
         android:id="@+id/txtHistorique"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="50dp"
         android:background="@drawable/fragment_profile_history_title"
         android:paddingStart="10dp"
         android:paddingEnd="15dp"
         android:text="@string/fragment_profile_history_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtNomProfil" />
+        app:layout_constraintBottom_toBottomOf="@id/txtNombreEvenements"
+        app:layout_constraintStart_toEndOf="@id/btnDeconnexion"
+        app:layout_constraintTop_toTopOf="@id/txtNombreEvenements"
+        />
+
+    <!-- Land separetor -->
+    <View
+        android:id="@+id/history_land_separator"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:background="@color/black"
+        app:layout_constraintTop_toTopOf="@id/txtHistorique"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/txtHistorique"
+        />
 
     <!-- Colonnes -->
     <View
         android:id="@+id/history_column_separator_top"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtHistorique" />
+        app:layout_constraintStart_toStartOf="@id/txtHistorique"
+        app:layout_constraintTop_toBottomOf="@id/txtHistorique"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
     <TextView
         android:id="@+id/history_column_type"
@@ -111,8 +129,8 @@
         android:textStyle="bold"
         android:gravity="center"
         android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/txtHistorique"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/history_column_separator_top"
+        app:layout_constraintStart_toStartOf="@id/history_column_separator_top"
         />
 
     <TextView
@@ -169,11 +187,12 @@
 
     <View
         android:id="@+id/history_column_separator_bottom"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/history_column_type" />
+        app:layout_constraintStart_toStartOf="@id/history_column_type"
+        app:layout_constraintTop_toBottomOf="@id/history_column_type"
+        />
 
     <!-- FIN Colonnes -->
 
@@ -187,18 +206,19 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/txtHistorique"
         app:layout_constraintTop_toBottomOf="@id/history_column_separator_bottom"
-        tools:visibility="visible" />
+        tools:visibility="visible"
+        />
 
     <ListView
         android:id="@+id/history"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginBottom="3dp"
         app:layout_constraintTop_toBottomOf="@id/history_column_separator_bottom"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/history_column_separator_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@layout/profile_history_item"
