@@ -464,6 +464,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
                 public void onResponse(Call<Alert> call, Response<Alert> response) {
                     if (response.isSuccessful()) {
                         Log.d("Alert", response.toString());
+                        Toast.makeText(getApplicationContext(), "Alerte créée", Toast.LENGTH_SHORT).show();
                     } else {
                         Log.e("Alert", response.toString());
                     }
@@ -481,6 +482,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
                 public void onResponse(Call<Alert> call, Response<Alert> response) {
                     if (response.isSuccessful()) {
                         Log.d("Alert", response.toString());
+                        Toast.makeText(getApplicationContext(), "Alerte mise à jour", Toast.LENGTH_SHORT).show();
                     } else {
                         Log.e("Alert", response.toString());
                     }

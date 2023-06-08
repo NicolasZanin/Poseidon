@@ -33,9 +33,6 @@ import retrofit2.Response;
  */
 public class AlertsMenu extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-
     private static final String ARG_REAL_LOCATION = "real_location_param";
     private static final String ARG_MAP_LOCATION = "map_location_param";
     private Location currentRealLocation;
@@ -54,10 +51,8 @@ public class AlertsMenu extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment AlertsMenu.
      */
-    // TODO: Rename and change types and number of parameters
     public static AlertsMenu newInstance(String param1, String param2) {
         AlertsMenu fragment = new AlertsMenu();
-        Bundle args = new Bundle();
         return fragment;
     }
 
@@ -72,7 +67,7 @@ public class AlertsMenu extends Fragment {
                     List<Alert> alerts = response.body();
                     assert alerts != null;
                     Log.d("Liste alerte", alerts.toString());
-                    container.setAdapter(new AlertAdapter(getContext(), alerts));
+                    container.setAdapter(new AlertAdapter(getContext(), alerts, currentRealLocation, currentMapLocation));
                 } else {
                     Log.e("Alert", "Alerts for user not retrieved");
                 }
@@ -117,7 +112,6 @@ public class AlertsMenu extends Fragment {
         Button addAlertButton = view.findViewById(R.id.alerts_menu_add_button);
         addAlertButton.setOnClickListener(v -> {
             closeFragment();
-            // TODO :add location
             EditAlert editAlertFragment = new EditAlert();
             Bundle args = new Bundle();
             // Real location

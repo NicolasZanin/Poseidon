@@ -23,6 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.osmdroid.util.GeoPoint;
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -119,6 +120,16 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
         // Avoid user miscliking on the activity holding when fragment open
         view.findViewById(R.id.edit_alert_fragment_layout).setOnClickListener(v -> {});
 
+        TextView rangeValue = view.findViewById(R.id.range_value);
+        rangeValue.setText("Périmètre : " + String.valueOf((int)this.alert.getPerimeter()) + " milles marin");
+
+        TextView title = view.findViewById(R.id.edit_alert_title);
+        if(this.type.equals("create")){
+            title.setText("Créer une alerte");
+        }else{
+            title.setText("Modifier une alerte");
+        }
+
         TextView close = view.findViewById(R.id.close_edit_alert);
         close.setOnClickListener(v -> {
             closeFragment();
@@ -192,7 +203,34 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
             Log.d("Edit alert", this.alert.toString());
             // TODO: get location from map
             this.onConfirmEditAlertListener.onAlertCreated(this.type, this.alert);
-            closeFragment(); // TODO: open alertMenuFragment if created or edited successfully
+            closeFragment();
+            AlertsMenu alertsMenuFragment = new AlertsMenu();
+            Bundle args = new Bundle();
+            // Real location
+            args.putParcelable("real_location_param", currentRealLocation);
+            alertsMenuFragment.setArguments(args);
+
+            // Map location
+            args.putParcelable("map_location_param", currentMapLocation);
+            alertsMenuFragment.setArguments(args);
+            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment, alertsMenuFragment).commit();
+        });
+
+        Button cancel = view.findViewById(R.id.cancel);
+        cancel.setOnClickListener(v -> {
+            // open alertMenuFragment
+            closeFragment();
+            // TODO :add location
+            AlertsMenu alertsMenuFragment = new AlertsMenu();
+            Bundle args = new Bundle();
+            // Real location
+            args.putParcelable("real_location_param", currentRealLocation);
+            alertsMenuFragment.setArguments(args);
+
+            // Map location
+            args.putParcelable("map_location_param", currentMapLocation);
+            alertsMenuFragment.setArguments(args);
+            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment, alertsMenuFragment).commit();
         });
 
 
