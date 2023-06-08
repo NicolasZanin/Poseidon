@@ -2,7 +2,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <ImageView
@@ -34,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            tools:text="@string/profile_history_item_sample_date"
+            android:text="@string/profile_history_item_sample_date"
             android:layout_gravity="center"
             />
 
@@ -66,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            tools:text="@string/profile_history_item_sample_coordinate"
+            android:text="@string/profile_history_item_sample_coordinate"
             android:layout_gravity="center"
             />
 
@@ -86,11 +85,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
+        android:text="@string/profile_history_item_sample_duration"
         app:layout_constraintStart_toEndOf="@id/coordinates"
         app:layout_constraintEnd_toStartOf="@id/locate"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="@string/profile_history_item_sample_duration"
         android:gravity="center"
         />
 
