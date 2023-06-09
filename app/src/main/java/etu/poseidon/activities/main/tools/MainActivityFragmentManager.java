@@ -31,16 +31,14 @@ public class MainActivityFragmentManager {
     }
 
     public void openWeatherConditionUpdaterFragment(Poi poi){
-        closeOpenedFragment();
         openedFragment = WeatherConditionUpdaterFragment.newInstance(poi);
-        mainActivity.getSupportFragmentManager().beginTransaction().add(R.id.fragment, openedFragment).commit();
+        mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, openedFragment).commit();
     }
 
     public void openWeatherConditionCreatorFragment(){
         if(Account.isLoggedIn()){
-            closeOpenedFragment();
             openedFragment = WeatherConditionCreatorFragment.newInstance(mainActivity.getCurrentRealLocation(), new GeoPoint(mainActivity.getMap().getMapCenter().getLatitude(), mainActivity.getMap().getMapCenter().getLongitude()));
-            mainActivity.getSupportFragmentManager().beginTransaction().add(R.id.fragment, openedFragment).commit();
+            mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, openedFragment).commit();
         } else {
             openLoginFragment();
         }
@@ -48,9 +46,8 @@ public class MainActivityFragmentManager {
 
     public void openProfileFragment(){
         if(Account.isLoggedIn()){
-            closeOpenedFragment();
             ProfileFragment profileFragment = new ProfileFragment();
-            mainActivity.getSupportFragmentManager().beginTransaction().add(R.id.fragment, profileFragment).commit();
+            mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, profileFragment).commit();
             openedFragment = profileFragment;
         } else {
             openLoginFragment();
@@ -59,8 +56,6 @@ public class MainActivityFragmentManager {
 
     public void openAlertFragment(){
         if(Account.isLoggedIn()){
-            closeOpenedFragment();
-
             AlertsMenu alertFragment = new AlertsMenu();
 
             Bundle args = new Bundle();
@@ -73,7 +68,7 @@ public class MainActivityFragmentManager {
             args.putParcelable("map_location_param", location);
             alertFragment.setArguments(args);
 
-            mainActivity.getSupportFragmentManager().beginTransaction().add(R.id.fragment, (Fragment) alertFragment).commit();
+            mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, (Fragment) alertFragment).commit();
             openedFragment = alertFragment;
         } else {
             openLoginFragment();
@@ -81,14 +76,12 @@ public class MainActivityFragmentManager {
     }
 
     public void openLoginFragment(){
-        closeOpenedFragment();
         LoginFragment loginFragment = new LoginFragment();
-        mainActivity.getSupportFragmentManager().beginTransaction().add(R.id.fragment, loginFragment).commit();
+        mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, loginFragment).commit();
         openedFragment = loginFragment;
     }
 
     public void openSearchFragment(ArrayList<WeatherCondition> weatherSelected, String searchText){
-        closeOpenedFragment();
         SearchFragment searchFragment = SearchFragment.newInstance(weatherSelected, searchText);
         mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment, searchFragment).commit();
         openedFragment = searchFragment;
