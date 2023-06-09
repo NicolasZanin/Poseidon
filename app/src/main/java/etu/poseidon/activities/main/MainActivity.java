@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
             // isPositionOnMapSet is used to set the zoom and center of the map only when the app starts
             if(isPositionOnMapSet) gestionnaireMap.animateTo(new GeoPoint(location.getLatitude(), location.getLongitude()));
             else {
-                gestionnaireMap.setZoom(20.0);
+                gestionnaireMap.setZoom(15.0);
                 gestionnaireMap.setCenter(new GeoPoint(location.getLatitude(), location.getLongitude()));
                 isPositionOnMapSet = true;
             }
@@ -443,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
         fragmentManager.closeOpenedFragment();
         GeoPoint poiPosition = new GeoPoint(poi.getLatitude(), poi.getLongitude());
         gestionnaireMap.setCenter(poiPosition);
-        gestionnaireMap.setZoom(20.0);
+        gestionnaireMap.setZoom(15.0);
         fragmentManager.openWeatherConditionUpdaterFragment(poi);
     }
 
