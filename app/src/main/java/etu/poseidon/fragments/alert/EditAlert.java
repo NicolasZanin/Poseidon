@@ -204,7 +204,7 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
             // TODO: get location from map
             this.onConfirmEditAlertListener.onAlertCreated(this.type, this.alert);
             closeFragment();
-            AlertsMenu alertsMenuFragment = new AlertsMenu();
+            /*AlertsMenu alertsMenuFragment = new AlertsMenu();
             Bundle args = new Bundle();
             // Real location
             args.putParcelable("real_location_param", currentRealLocation);
@@ -213,7 +213,7 @@ public class EditAlert extends Fragment  implements WeatherConditionListSelector
             // Map location
             args.putParcelable("map_location_param", currentMapLocation);
             alertsMenuFragment.setArguments(args);
-            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment, alertsMenuFragment).commit();
+            requireActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment, alertsMenuFragment).commit();*/
         });
 
         Button cancel = view.findViewById(R.id.cancel);
