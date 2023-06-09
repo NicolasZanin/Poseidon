@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
         for (Overlay overlay : map.getOverlays()) {
             if (overlay instanceof Marker) {
                 Marker marker = (Marker) overlay;
-                if (marker.getPosition().getLatitude() == latitude && marker.getPosition().getLongitude() == longitude) {
+                if (marker.getPosition().getLatitude() == latitude && marker.getPosition().getLongitude() == longitude && marker.getId() == null) {
                     map.getOverlays().remove(marker);
                     map.invalidate();
                     break;
