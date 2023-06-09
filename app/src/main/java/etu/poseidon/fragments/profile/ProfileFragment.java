@@ -69,13 +69,9 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        // Photo de profil - Récupération depuis Google ou récupération de l'image de profil de base depuis les ressources si inexistante chez Google
-        //if(loggedInAccount.getPhotoUrl() == null) {
-            Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.profil, null);
-            profileImage.setImageDrawable(drawable);
-        //} else {
-        //    Picasso.get().load(loggedInAccount.getPhotoUrl()).into(profileImage);
-        //}
+        // Photo de profil - image de profil de base depuis les ressources
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.profil, null);
+        profileImage.setImageDrawable(drawable);
 
         profileNameTextView.setText(Account.getDisplayName());
         updateNumberOfEvents(0);

@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements Observer,
      * Supprime tous les points de la carte
      */
     private void removeAllPOIs() {
-        Optional<Overlay> blueDotMarker = map.getOverlays().stream().filter(o -> o instanceof Marker && ((Marker) o).getId().equals("global")).findFirst();
+        Optional<Overlay> blueDotMarker = map.getOverlays().stream().filter(o -> o != null && o instanceof Marker && ((Marker) o).getId().equals("global")).findFirst();
         map.getOverlays().clear();
         map.invalidate();
         blueDotMarker.ifPresent(marker -> map.getOverlays().add(marker));
